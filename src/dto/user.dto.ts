@@ -24,6 +24,7 @@ import{
 export class UserDetailsDTO{
     @IsString()
     first_name:string
+    
     @IsOptional()
     middle_name:string
 
@@ -34,4 +35,19 @@ export class UserDetailsDTO{
     @IsNotEmpty()
     @IsDefined()
     phone_number:string
+}
+
+export class UserDTO extends UserDetailsDTO{
+    @IsNotEmpty()
+    @IsEmail()
+    email:string
+
+    
+    @IsNotEmpty()
+    @IsString()
+    password:string
+
+
+
+
 }

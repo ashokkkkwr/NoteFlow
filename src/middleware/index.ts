@@ -35,6 +35,8 @@ const middleware =(app:Application)=>{
             limit:'10mb',
         })
     )
+
+
     //app.use(morganMiddleware)
     app.use(morgan('common'))
     app.use('/api',routes)
@@ -49,7 +51,4 @@ const middleware =(app:Application)=>{
     app.use(errorHandler)
 
 }
-
-
-
 export default middleware

@@ -1,6 +1,6 @@
 import {Column,Entity,JoinColumn,OneToOne} from 'typeorm'
 import Base from '../base.entity'
-
+import { User } from './user.entity'
 @Entity('user_details')
 export class UserDetails extends Base
 {
@@ -18,6 +18,12 @@ export class UserDetails extends Base
      @Column({})
      phone_number:string
 
-    
+    @OneToOne(()=>User,(user)=>user.details,{
+        onDelete:'CASCADE',
+        onUpdate:'CASCADE'
+
+    })
+    @JoinColumn({name:'user_id'})
+    user:User
 
 }
