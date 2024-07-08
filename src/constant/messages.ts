@@ -1,3 +1,4 @@
 export const Message={
-    error:'Error occurred'
+    error:'Error occurred',
+    created:'Successfully created'
 }

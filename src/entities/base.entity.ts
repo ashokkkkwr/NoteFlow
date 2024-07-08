@@ -16,6 +16,5 @@ abstract class Base extends BaseEntity{
     async UUID(){
         this.id = await createUUID()
     }
-
 }
 export default Base

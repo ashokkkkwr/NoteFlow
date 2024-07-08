@@ -7,6 +7,7 @@ import {StatusCodes} from '../constant/statusCodes';
 import routes from '../routes/index.route';
 import {errorHandler} from './errorHandler.middleware'
 import {morganMiddleware} from './morgan.middleware'
+import morgan from "morgan";
 const middleware =(app:Application)=>{
     console.log('DotenvConfig.CORS_ORIGIN',DotenvConfig.CORS_ORIGIN)
     app.use(compression())
@@ -20,12 +21,12 @@ const middleware =(app:Application)=>{
     )
     app.use((req:Request,res:Response,next:NextFunction)=>{
         const userAgent = req.headers['user-agent']
-        const apiKey= req.headers['apiKey'
-        ]
+        const apiKey= req.headers['apikey']
+
         if(userAgent&&userAgent.includes('Mozilla')){
             next()
         }else{
-            if(apiKey === DotenvConfig.API_KEY)next()
+            if(apiKey === DotenvConfig.API_KEY) next()
             else res.status(StatusCodes.FORBIDDEN).send('Forbidden')
         }
     })
@@ -34,8 +35,9 @@ const middleware =(app:Application)=>{
             limit:'10mb',
         })
     )
-    app.use(morganMiddleware)
-    app.use('/api/v1',routes)
+    //app.use(morganMiddleware)
+    app.use(morgan('common'))
+    app.use('/api',routes)
     app.use(express.static(path.join(__dirname,'..','..','public')))
     app.use('/public/uploads',express.static(path.join(__dirname,'..','..','public/uploads')))
     app.set('view engine','ejs')
@@ -48,5 +50,6 @@ const middleware =(app:Application)=>{
 
 }
 
-export default middleware
 
+
+export default middleware
