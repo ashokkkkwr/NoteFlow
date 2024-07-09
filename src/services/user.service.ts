@@ -3,14 +3,17 @@ import { UserDetails } from '../entities/user/details.entity'
 import { User } from '../entities/user/user.entity'
 import { Message } from '../constant/messages'
 import { UserDTO } from '../dto/user.dto'
+import HttpException from '../utils/HttpException.utils'
 class UserService {
     constructor(
         private readonly UserRepo = AppDataSource.getRepository(User)
     ){
-
+ 
     }
  
     async create(data: UserDTO): Promise<string> { 
+        try{
+
         const user = new User()
         user.email = data.email
         user.password = data.password 
@@ -23,17 +26,32 @@ class UserService {
         details.user = resUser
         await details.save()
         return Message.created
+        }catch(error:any){
+            throw HttpException.badRequest(error.message)
+        }
+
     }
+
     async getAll(){
+        try{
+
         return await this.UserRepo.createQueryBuilder('user')
+        
 /**
  * user is the entity that represents the realtionship.
  * arko parameter chai refer ko lagi matrai ho j name dida ni hunxa
- * 
- * 
  */
         .leftJoinAndSelect('user.details','details')
-        .getMany()
+        .getMany()}catch(error:any){
+            throw HttpException.badRequest(error.Message)
+        }
+    }
+    async getById(id:string){
+        const query =this.UserRepo.createQueryBuilder('user').where('user.id=:id',{id})
+        query.leftJoinAndSelect('user.details','details')
+        const user = await query.getOne()
+        if(!user) throw HttpException.notFound(Message.notFound)
+        return user
     }
 }
 

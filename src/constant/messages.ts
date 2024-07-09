@@ -1,5 +1,8 @@
 export const Message={
     error:'Error occurred',
     created:'Successfully created',
-    fetched:'Successfully fetched'
+    fetched:'Successfully fetched',
+    notFound:'Not Found',
+    invalidCredentials:'Invalid Credentials',
+    loginSuccessfully:'LoggedIn Successfully'
 }
