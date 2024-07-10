@@ -5,9 +5,13 @@ import { type Request,type Response } from "express"
 import { Message } from "../constant/messages"
 import { UserDTO } from "../dto/user.dto"
 import webTokenService from "../utils/webToken.service"
+import {Role} from '../constant/enum'
+import HttpException from "../utils/HttpException.utils"
 export class UserAuthController{
 
 async create(req:Request, res:Response){
+    const bodyRole =req.body?.role
+    if(bodyRole === Role.SUDO_ADMIN)throw HttpException.forbidden(Message.notAuthorized)
     await userService.create(req.body as UserDTO)
     res.status(StatusCodes.CREATED).json({
         status:true,
@@ -25,6 +29,7 @@ async getAll(req:Request,res:Response){
         data:data
     })
 }
+
 async login (req:Request, res:Response){
     const data = await authService.login(req.body)
     const tokens = webTokenService.generateTokens({

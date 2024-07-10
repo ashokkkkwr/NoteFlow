@@ -1,6 +1,7 @@
-import {Column,Entity,JoinColumn,OneToOne} from 'typeorm'
+import {Column,Entity,JoinColumn,OneToMany,OneToOne} from 'typeorm'
 import Base from '../base.entity'
 import { User } from './user.entity'
+import Media from '../media.entity'
 @Entity('user_details')
 export class UserDetails extends Base
 {
@@ -12,8 +13,7 @@ export class UserDetails extends Base
      middle_name:string
 
      @Column({})
-     last_name:string
-     
+     last_name:string    
      
      @Column({})
      phone_number:string
@@ -25,5 +25,8 @@ export class UserDetails extends Base
     })
     @JoinColumn({name:'user_id'})
     user:User
+
+    @OneToMany(()=>Media,(media)=>media.details)
+    profileImage:Media[]
 
 }

@@ -1,5 +1,6 @@
 import {Router,type Request, type Response} from 'express'
 import user from './user.route'
+import note from './notes.route'
 
 
 export interface Route{
@@ -11,8 +12,13 @@ const routes:Route[]=[
     {
         path:'/user',
         route:user,
+    },
+    {
+        path:'/notes',
+        route:note
     }
 ]
+
 routes.forEach((route) => {
   router.use(route.path, route.route)
 })

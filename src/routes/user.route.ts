@@ -10,7 +10,7 @@ import { LoginDTO } from '../dto/auth.dto'
 const router:IRouter = Router()
 
 
-const userAuthController = new UserAuthController
+const userAuthController = new UserAuthController()
 router.post('/',RequestValidator.validate(UserDTO),catchAsync(userAuthController.create))
 router.get('/',userAuthController.getAll)
 router.post('/login',RequestValidator.validate(LoginDTO),catchAsync(userAuthController.login))

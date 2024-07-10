@@ -1,4 +1,3 @@
-import {Type as CType} from 'class-transformer'
 import{
     IsArray,
 //values must be defined. should not be `undefined`
@@ -19,8 +18,10 @@ import{
     Matches,
 // Ensures that the value is not equals to specified value.
     NotEquals,
-    ValidateNested
+    ValidateNested,
+    IsEnum
 }from 'class-validator'
+import {Role} from '../constant/enum'
 export class UserDetailsDTO{
     @IsString()
     first_name:string
@@ -46,6 +47,10 @@ export class UserDTO extends UserDetailsDTO{
     @IsNotEmpty()
     @IsString()
     password:string
+
+    @IsNotEmpty()
+    @IsEnum(Role,{message:'Invalid role'})
+    role:Role
 
 
 

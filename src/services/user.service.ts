@@ -4,19 +4,24 @@ import { User } from '../entities/user/user.entity'
 import { Message } from '../constant/messages'
 import { UserDTO } from '../dto/user.dto'
 import HttpException from '../utils/HttpException.utils'
+import BcryptService from '../utils/bcryptService'
 class UserService {
     constructor(
-        private readonly UserRepo = AppDataSource.getRepository(User)
+        private readonly UserRepo = AppDataSource.getRepository(User),
+        private readonly bcryptService = new BcryptService()
     ){
  
     }
  
     async create(data: UserDTO): Promise<string> { 
+       
+       
         try{
 
         const user = new User()
         user.email = data.email
         user.password = data.password 
+        user.password = await this.bcryptService.hash(data.password)
         const resUser = await user.save()
         const details = new UserDetails()
         details.first_name = data.first_name
@@ -26,17 +31,17 @@ class UserService {
         details.user = resUser
         await details.save()
         return Message.created
-        }catch(error:any){
+        }catch(error:any)
+        {
             throw HttpException.badRequest(error.message)
         }
-
     }
 
     async getAll(){
         try{
 
         return await this.UserRepo.createQueryBuilder('user')
-        
+             
 /**
  * user is the entity that represents the realtionship.
  * arko parameter chai refer ko lagi matrai ho j name dida ni hunxa
@@ -46,6 +51,7 @@ class UserService {
             throw HttpException.badRequest(error.Message)
         }
     }
+
     async getById(id:string){
         const query =this.UserRepo.createQueryBuilder('user').where('user.id=:id',{id})
         query.leftJoinAndSelect('user.details','details')
@@ -54,5 +60,4 @@ class UserService {
         return user
     }
 }
-
 export default new UserService()

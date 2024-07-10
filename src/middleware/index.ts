@@ -7,6 +7,7 @@ import {StatusCodes} from '../constant/statusCodes';
 import routes from '../routes/index.route';
 import {errorHandler} from './errorHandler.middleware'
 import {morganMiddleware} from './morgan.middleware'
+
 import morgan from "morgan";
 const middleware =(app:Application)=>{
     console.log('DotenvConfig.CORS_ORIGIN',DotenvConfig.CORS_ORIGIN)
