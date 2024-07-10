@@ -1,9 +1,10 @@
-declare namespace Express{
-    export interface Request{
-        user?:{
-            id?:string
-        }
-        files?: any
-
+declare namespace Express {
+  export interface Request {
+    user?: {
+      id?: string
+      role?: string
     }
+    files?: any
+  }
 }
+

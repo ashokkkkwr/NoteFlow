@@ -1,28 +1,27 @@
 import fs from 'fs'
 import path from 'path'
-import { AfterLoad,Column,Entity,JoinColumn,ManyToOne } from 'typeorm'
+import { AfterLoad, Column, Entity, JoinColumn, ManyToOne } from 'typeorm'
 import { DotenvConfig } from '../config/env.config'
 import { MediaType } from '../constant/enum'
-import {getUploadFolderPath,getTempFolderPath } from '../utils/path.utils'
+import { getUploadFolderPath, getTempFolderPath } from '../utils/path.utils'
 
 import { UserDetails } from './user/details.entity'
 import Base from './base.entity'
 
 @Entity('media')
-class Media extends Base{
+class Media extends Base {
+  @Column({ nullable: true })
+  name: string
 
-    @Column({nullable:true})
-    name:string
+  @Column({ name: 'mime_type' })
+  mimeType: string
 
-    @Column({name:'mime_type',})
-    mimeType:string
+  @Column({ enum: MediaType, type: 'enum' })
+  type: MediaType
 
-    @Column({enum:MediaType,type:'enum'})
-    type:MediaType
-
-    @ManyToOne(()=>UserDetails,(details)=>details.profileImage)
-    @JoinColumn({name:'details_id'})
-    details:UserDetails
+  @ManyToOne(() => UserDetails, (details) => details.profileImage)
+  @JoinColumn({ name: 'details_id' })
+  details: UserDetails
 
   /**
    * Moves an image file from the temporary folder to the upload folder.
