@@ -7,5 +7,6 @@ export const Message = {
   loginSuccessfully: 'LoggedIn Successfully',
   notAuthorized: 'You are not authorized ',
   tokenExpired: 'session out',
-  updated:'successfully updated'
+  updated:'successfully updated',
+  deleted:'Successfully deleted'
 }

@@ -11,11 +11,8 @@ class NotesService {
     private readonly userRepo = AppDataSource.getRepository('User')
   ) {}
   async create(userId: string, data: NotesDTO) {
-    const user = await this.userRepo.findOneBy({ id: userId })
-    if (!user) {
-      throw HttpException.notFound(Message.notFound)
-    }
-    const note = this.notesRepo.create({ ...data, user })
+   
+    const note = this.notesRepo.create({ ...data, userId })
     await this.notesRepo.save(note)
   }
   async getOne(userId: string) {
@@ -35,20 +32,25 @@ class NotesService {
     return notes
   }
   async update(userId:string,noteId:string,data:UpdateNotesDTO){
-    const user = await this.userRepo.findOneBy({id:userId})
-    if (!user) {
-      throw HttpException.notFound(Message.notFound)
-    }
-    const note = await this.notesRepo.findOneBy({id:noteId,user:{id:userId}})
+// Checks if the note with the given noteId belongs to the user with the token userId
+const note = await this.notesRepo.findOneBy({id:noteId,user:{id:userId}})
     if(!note){
       throw HttpException.notFound(Message.notFound)
     }
+// The merge method merges the existing note object with the updated data provided.
     this.notesRepo.merge(note,data)
     await this.notesRepo.save(note)
     return note
     }
   
-  
+  async delete(userId:string,noteId:string){
+    const note = await this.notesRepo.findOneBy({id:noteId,user:{id:userId}})
+    if(!note){
+      throw HttpException.notFound(Message.notFound)
+    }
+    this.notesRepo.delete(note)
+    return note
+  }
 }
 
 export default new NotesService()

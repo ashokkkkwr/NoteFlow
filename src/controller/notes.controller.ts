@@ -1,7 +1,7 @@
 import { StatusCodes } from '../constant/statusCodes'
 import { type Request, type Response } from 'express'
 import notesService from '../services/notes.service'
-import { NotesDTO, UpdateNotesDTO} from '../dto/notes.dto'
+import { NotesDTO, UpdateNotesDTO } from '../dto/notes.dto'
 import { Message } from '../constant/messages'
 import HttpException from '../utils/HttpException.utils'
 
@@ -58,27 +58,53 @@ export class NotesController {
       data,
     })
   }
-  async update(req:Request,res:Response){
-    const userId  = req.user?.id
+  async update(req: Request, res: Response) {
+    const userId = req.user?.id
     const noteId = req.params.id
-    if(!userId){
+    if (!userId) {
       return res.status(StatusCodes.UNAUTHORIZED).json({
-        status:false,
-        message:Message.notAuthorized
+        status: false,
+        message: Message.notAuthorized,
       })
     }
-    const updateNotesDTO:UpdateNotesDTO = req.body
-    try{
-      const updatedNote = await notesService.update(userId,noteId,updateNotesDTO)
+    const updateNotesDTO: UpdateNotesDTO = req.body
+    try {  
+      const updatedNote = await notesService.update(userId, noteId, updateNotesDTO)
       res.status(StatusCodes.SUCCESS).json({
-        status:true,
-        message:Message.updated,
-        data:updatedNote,
+        status: true,
+        message: Message.updated,
+        data: updatedNote,
       })
+    } catch (error: any) {
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        status: false,
+        message: error.message,
+      })
+    }
+  }
+  async delete (req:Request,res:Response){
+    console.log('ya chai aaipugo hai')
+    const userId = req.user?.id
+    const noteId = req.params.id
+    console.log(userId)
+    if (!userId) {
+      return res.status(StatusCodes.UNAUTHORIZED).json({
+        status: false,
+        message: Message.notAuthorized,
+      })
+    }
+    try{
+      const deleteNote = await notesService.delete(userId,noteId)
+      res.status(StatusCodes.SUCCESS).json({
+        status: true,
+        message: Message.deleted,
+        data: deleteNote,
+      })
+
     }catch(error:any){
       res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
         status:false,
-        message:error.message
+        message:error.message,
       })
     }
   }
