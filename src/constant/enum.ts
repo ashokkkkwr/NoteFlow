@@ -11,3 +11,9 @@ export enum Role {
   ADMIN = 'ADMIN',
   USER = 'USER',
 }
+export enum Status{
+  PENDING = 'PENDING',
+  ACCEPTED = 'ACCEPTED',
+  DECLINED = 'DECLINED',
+
+}

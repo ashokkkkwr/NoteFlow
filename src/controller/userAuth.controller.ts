@@ -7,6 +7,7 @@ import { UserDTO } from '../dto/user.dto'
 import webTokenService from '../utils/webToken.service'
 import { Role } from '../constant/enum'
 import HttpException from '../utils/HttpException.utils'
+
 export class UserAuthController {
   async create(req: Request, res: Response) {
     const bodyRole = req.body?.role

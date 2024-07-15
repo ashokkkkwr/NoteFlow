@@ -15,6 +15,9 @@ abstract class Base extends BaseEntity {
   @BeforeInsert()
   async UUID() {
     this.id = await createUUID()
+    
   }
 }
+
 export default Base
+

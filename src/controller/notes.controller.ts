@@ -8,7 +8,7 @@ import HttpException from '../utils/HttpException.utils'
 export class NotesController {
   async create(req: Request, res: Response) {
     const userId = req.user?.id
-    console.log(req.user)
+   
     console.log(userId, 'userId')
     if (!userId) {
       return res.status(StatusCodes.UNAUTHORIZED).json({
@@ -18,10 +18,12 @@ export class NotesController {
     }
     const notesDTO: NotesDTO = req.body
     try {
-      await notesService.create(userId, notesDTO)
+      const data=await notesService.create(userId, notesDTO)
+      console.log(data,'dataa')
       res.status(StatusCodes.CREATED).json({
         status: true,
         message: Message.created,
+        data,
       })
     } catch (error: any) {
       res.status(error.status || StatusCodes.INTERNAL_SERVER_ERROR).json({

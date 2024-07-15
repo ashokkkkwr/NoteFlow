@@ -12,18 +12,18 @@ export const authentication = () => {
      * type(eg:Bearer) and the second element should be the actual token.
      */
     const tokens = req.headers.authorization?.split(' ')
-    console.log(tokens,"token")
     try {
       if (!tokens) {
         throw HttpException.unauthorized(Message.notAuthorized)
       }
+      
       const mode = tokens[0]
       const accessToken = tokens[1]
       if (mode !== 'Bearer' || !accessToken) throw HttpException.unauthorized(Message.notAuthorized)
       const payload = webTokenService.verify(accessToken, DotenvConfig.ACCESS_TOKEN_SECRET)
       if (payload) {
         req.user = payload
-        console.log('before next')
+    
         next()
       } else {
         throw HttpException.unauthorized(Message.notAuthorized)

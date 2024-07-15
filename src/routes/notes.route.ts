@@ -14,9 +14,14 @@ const notesController = new NotesController()
 router.get('/all', catchAsync(notesController.getAll))
 router.use(authentication())
 router.use(authorization([Role.USER]))
+
 router.post('/', RequestValidator.validate(NotesDTO), catchAsync(notesController.create))
 router.get('/', catchAsync(notesController.getOne))
 router.patch('/:id', RequestValidator.validate(UpdateNotesDTO), catchAsync(notesController.update))
 router.delete('/:id',catchAsync(notesController.delete))
 
+
+
+
 export default router
+
