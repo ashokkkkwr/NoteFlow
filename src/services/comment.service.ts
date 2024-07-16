@@ -25,32 +25,25 @@ class CommentService {
       }
     }
     console.log(parentComment,"parent comment")
-
     const addComment = this.CommentRepo.create({
       comment: data.comment,
       note: note,
       parent: parentComment,
     });
-
     await this.CommentRepo.save(addComment);
     return addComment;
   }
-  
   async update(commentId: string, data: CommentDTO) {
     const comment = await this.CommentRepo.findOne({ where: { id: commentId } })
-
     console.log(comment)
-
     if (!comment) {
       throw new Error('comment not found')
     }
 
     // Update the comment entity with new data
     comment.comment = data.comment
-
     // Save the updated comment entity
     const updatedComment = await this.CommentRepo.save(comment)
-
     return updatedComment
   }
   async comment(postId:string){
@@ -67,5 +60,4 @@ class CommentService {
     return comments
   }
 }
-
 export default new CommentService()
