@@ -14,6 +14,6 @@ const commentController = new CommentController()
 const router = express.Router()
 router.post('/:id',RequestValidator.validate(CommentDTO),catchAsync(commentController.addComment))
 router.patch('/:id',catchAsync(commentController.updateComment))
-router.get('/:id',catchAsync(commentController.updateComment))
+router.get('/:id',catchAsync(commentController.getComments))
 
 export default router
