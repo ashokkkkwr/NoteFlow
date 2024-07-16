@@ -1,5 +1,4 @@
-import { IsString, IsNotEmpty,IsEnum } from 'class-validator'
-import {Status}from '../constant/enum'
+import { IsString, IsNotEmpty,IsEnum, IsEmpty, IsOptional } from 'class-validator'
 export class CommentDTO {
  
 
@@ -7,6 +6,9 @@ export class CommentDTO {
     @IsString()
     comment:string
 
+
+    @IsOptional()
+    parentId?:string;
   
   
 }

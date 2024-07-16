@@ -7,15 +7,13 @@ import express from 'express'
 import { authorization } from '../middleware/authorization.middleware'
 import { authentication } from '../middleware/authentication.middleware'
 import { CommentController } from '../controller/comment.controller'
-
+import { CommentDTO } from '../dto/comment.dto'
 const commentController = new CommentController()
 
 
 const router = express.Router()
-
- 
-router.post('/:id',catchAsync(commentController.addComment))
-
+router.post('/:id',RequestValidator.validate(CommentDTO),catchAsync(commentController.addComment))
+router.patch('/:id',catchAsync(commentController.updateComment))
+router.get('/:id',catchAsync(commentController.updateComment))
 
 export default router
-

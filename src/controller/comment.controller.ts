@@ -24,7 +24,7 @@ export class CommentController {
         try{
         const postId = req.params.id
         console.log(postId)
-        const data = await commentService.create(postId as string, req.body)
+        const data = await commentService.create(postId as string, req.body as CommentDTO)
         res.status(StatusCodes.CREATED).json({
             status:true,
             message:Message.created,
@@ -32,23 +32,54 @@ export class CommentController {
         })
       
         }catch(error:any){
-            res.status(error.status||StatusCodes.INTERNAL_SERVER_ERROR).json({
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
                 status:false,
                 message:error.message
             })
         }
     }
+    
+    async updateComment(req:Request,res:Response)
+    {
+        try{
+             
+            const commentId= req.params.id
+            console.log(commentId,"comment id")
+            const data = await commentService.update(commentId as string,req.body as CommentDTO)
+            res.status(StatusCodes.CREATED).json({
+                status:true,
+                message:Message.updated,
+                data
+            })
+
+        }catch(err:any){
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+                status:false,
+                message:err.message
+            })
+        }
+    }
+    async getComments(req:Request, res:Response){
+        try{
+            const postId = req.params.id;
+            const comments = await commentService.comment(postId);
+            res.status(StatusCodes.SUCCESS).json({
+                status:true,
+                message:Message.fetched,
+                data:comments
+            })
+        }catch(error:any){
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+                status:false,
+                message:error.message,
+            })
+        }
+   
+
+    }
     async deleteComments()
     {
-
-    }
-    async updateComment()
-    {
-
-    }
-    async readComment()
-    {
-
+        
     }
 
 }
