@@ -10,7 +10,6 @@ const router = express.Router()
 router.use(authentication())
 router.use(authorization([Role.USER]))
 
-
 router.post('/:id',catchAsync(FriendController.addFriend))
 router.get('/',catchAsync(FriendController.viewFriendRequest))
 router.patch('/accept/:id',catchAsync(FriendController.acceptRequest))

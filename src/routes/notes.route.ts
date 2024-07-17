@@ -20,8 +20,5 @@ router.get('/', catchAsync(notesController.getOne))
 router.patch('/:id', RequestValidator.validate(UpdateNotesDTO), catchAsync(notesController.update))
 router.delete('/:id',catchAsync(notesController.delete))
 
-
-
-
 export default router
 

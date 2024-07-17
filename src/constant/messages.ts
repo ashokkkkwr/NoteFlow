@@ -8,5 +8,6 @@ export const Message = {
   notAuthorized: 'You are not authorized ',
   tokenExpired: 'session out',
   updated:'successfully updated',
-  deleted:'Successfully deleted'
+  deleted:'Successfully deleted',
+  emailSent:'successfully email sent',
 }

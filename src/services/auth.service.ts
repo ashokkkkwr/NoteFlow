@@ -24,6 +24,16 @@ class AuthService {
     if (!isPasswordMatch) throw HttpException.notFound(Message.invalidCredentials)
     return await userService.getById(user.id)
   }
+  async verifyEmail(email:string){
+    const user = await this.userRepo.findOne({where:{email}})
+ 
+    if(!user) throw HttpException.notFound(Message.notFound)
+      return user 
+  }
+  async setToken(id:string,token:string):Promise<string>{
+    await this.userRepo.update(id,{token})
+    return Message.updated
+  }
 }
 
 

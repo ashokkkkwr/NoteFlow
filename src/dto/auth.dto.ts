@@ -10,3 +10,10 @@ export class LoginDTO {
   @IsString()
   password: string
 }
+export class VerifyEmailDTO{
+  @IsNotEmpty()
+  @IsString()
+  @IsEmail()
+  email:string
+
+}

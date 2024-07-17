@@ -26,9 +26,22 @@ export class User extends Base {
   })
   role: Role;
 
+  
+
   @OneToMany(() => Friends, (friends) => friends.sender)
   sentFriendRequests: Friends[];
 
   @OneToMany(() => Friends, (friends) => friends.receiver)
   receivedFriendRequests: Friends[];
+
+
+
+
+  @Column({nullable:true})
+  token:string
+
+  @Column({name:'opt_verified',default:false})
+  otpVerified:boolean
 }   
+
+

@@ -20,6 +20,7 @@ import {
   NotEquals,
   ValidateNested,
   IsEnum,
+  isEmail,
 } from 'class-validator'
 import { Role } from '../constant/enum'
 export class UserDetailsDTO {
