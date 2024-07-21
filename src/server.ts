@@ -1,4 +1,3 @@
-
 import { createServer } from 'http'
 import app from './config/app.config'
 import { AppDataSource } from './config/database.config'
