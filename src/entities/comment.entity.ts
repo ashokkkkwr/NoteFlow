@@ -1,12 +1,12 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
-import Notes from './note/notes.entity'; // Import Notes entity
+import {Notes} from './note/notes.entity'; // Import Notes entity
 import Base from './base.entity';
 @Entity('comment')
 class Comment extends Base {
   @Column()
   comment: string;
 
-  @ManyToOne(() => Notes, (note) => note.comment)
+  @ManyToOne(() => Notes, (note) => note.comments)
   @JoinColumn({ name: 'post_id' })
   note: Notes;
 
@@ -19,5 +19,4 @@ class Comment extends Base {
 
 
 }
-
 export default Comment;

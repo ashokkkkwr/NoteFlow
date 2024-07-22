@@ -62,7 +62,7 @@ export class CommentController {
     async getComments(req:Request, res:Response){
         try{
             const postId = req.params.id;
-            const comments = await commentService.comment(postId);
+            const comments = await commentService.getComment(postId);
             res.status(StatusCodes.SUCCESS).json({
                 status:true,
                 message:Message.fetched,
@@ -77,9 +77,23 @@ export class CommentController {
    
 
     }
-    async deleteComments()
+    async deleteComments(req:Request, res:Response)
     {
-        
+        try{
+            const commentId = req.params.id;
+            const deletedComment = await commentService.getComment(commentId);
+            res.status(StatusCodes.SUCCESS).json({
+                status:true,
+                message:Message.fetched,
+                data:deletedComment
+            })
+        }catch(error:any){
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+                status:false,
+                message:error.message,
+            })
+        }
     }
+    
 
 }

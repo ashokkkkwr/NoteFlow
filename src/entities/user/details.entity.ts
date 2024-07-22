@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm'
 import Base from '../base.entity'
 import { User } from './user.entity'
-import Media from '../media.entity'
+import UserMedia from './userMedia.entity'
 @Entity('user_details')
 export class UserDetails extends Base {
   @Column({})
@@ -23,6 +23,9 @@ export class UserDetails extends Base {
   @JoinColumn({ name: 'user_id' })
   user: User
 
-  @OneToMany(() => Media, (media) => media.details)
-  profileImage: Media[]
+
+  @OneToMany(() => UserMedia, (media) => media.UserMedia)
+  profileImage: UserMedia[];
+
+
 }

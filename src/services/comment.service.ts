@@ -1,5 +1,5 @@
 import Comment from '../entities/comment.entity'
-import Notes from '../entities/notes.entity'
+import {Notes} from '../entities/note/notes.entity'
 import { AppDataSource } from '../config/database.config'
 import { CommentDTO } from '../dto/comment.dto'
 import { IsNull } from 'typeorm';
@@ -46,7 +46,7 @@ class CommentService {
     const updatedComment = await this.CommentRepo.save(comment)
     return updatedComment
   }
-  async comment(postId:string){
+  async getComment(postId:string){
 
     const comments = await this.CommentRepo.find({
 // checks where the note (or post) has an id equal to postId.
@@ -58,6 +58,17 @@ class CommentService {
     })
     console.log(comments,"com")
     return comments
+  }
+  async deleteComment(commentId:string){
+    const comment = await this.CommentRepo.findOne({where:{id:commentId},relations:['replies']});
+    if (!comment) {
+      throw new Error('Comment not found');
+    }
+    if(comment.replies && comment.replies.length>0){
+      for(const reply of comment.replies){
+        await this.CommentRepo.remove(reply)
+      }
+    }
   }
 }
 export default new CommentService()

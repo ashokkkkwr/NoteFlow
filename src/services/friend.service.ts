@@ -5,6 +5,7 @@ import { Friends } from '../entities/friends.entity';
 import { Message } from '../constant/messages';
 import UserService from './user.service';
 import{Status}from '../constant/enum'
+import HttpException from '../utils/HttpException.utils';
 
 class FriendService {
   constructor(
@@ -54,27 +55,26 @@ class FriendService {
       const senderDetails = await UserService.getById(listSenderId[i]);
       console.log(senderDetails);
     }
-  }
-  async accepted(friendId:string){
-    const getFriend = await this.friendsRepo.findOne({
-      where:{
-        id:friendId
-      }
-    }) 
-    console.log(friendId)
-    console.log(getFriend?.id)
-    if(friendId===getFriend?.id) {
-    const accept = new Friends();
-    accept.status = Status.ACCEPTED;
-    await this.friendsRepo.save(accept);
-    console.log("error")
-    console.log(this.friendsRepo,"re[p")
+  }async accepted(friendId: string, userId: any) {
+  const friendRequest = await this.friendsRepo.findOne({
+    where: {
+      
+      receiver_id: userId,
+    },
+  });
+  console.log(friendRequest,'checking the reuqest')
 
-  }else{
-    console.log("vago")
+  if (!friendRequest) {
+    throw  HttpException.notFound
   }
-  console.log("kdhskfj")
-  }
+
+ 
+  friendRequest.status = Status.ACCEPTED;
+  await this.friendsRepo.save(friendRequest);
+
+  return friendRequest;
+}
+
 }
 
 export default new FriendService() 

@@ -1,7 +1,7 @@
 import { UserDetails } from './details.entity';
 import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
 import Base from '../base.entity';
-import Notes from '../notes.entity';
+import {Notes} from '../note/notes.entity';
 import { Role } from '../../constant/enum';
 import { Friends } from '../../entities/friends.entity';
 

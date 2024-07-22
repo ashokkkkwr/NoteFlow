@@ -8,6 +8,7 @@ import Error from './HttpException.utils'
 const storage = multer.diskStorage({
   destination: function (req: any, _file: any, cb: any) {
     let folderPath = ''
+    console.log(req.body.type,"ashook aksfhsf")
     if (!req.body.type) {
       return cb(Error.badRequest('Choose a File type'), '')
     }
@@ -34,7 +35,7 @@ const storage = multer.diskStorage({
     cb(null, folderPath)
   },
   filename: (_req, file, cb) => {
-    const extension = file.filename
+    const extension = file.originalname.substring(file.originalname.lastIndexOf('.'))
     const fileName = Date.now() + '-' + Math.round(Math.random() * 1e9) + '.' + extension
     cb(null, fileName)
   },

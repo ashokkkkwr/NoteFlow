@@ -38,6 +38,7 @@ const middleware = (app: Application) => {
 
   //app.use(morganMiddleware)
   app.use(morgan('common'))
+  app.use(express.urlencoded({extended:false}))
   app.use('/api', routes)
   app.use(express.static(path.join(__dirname, '..', '..', 'public')))
   app.use('/public/uploads', express.static(path.join(__dirname, '..', '..', 'public/uploads')))

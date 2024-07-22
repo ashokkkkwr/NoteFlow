@@ -7,6 +7,7 @@ import friendService from "../services/friend.service";
 
 export class friendController {
     async addFriend(req:Request, res:Response) {
+      
         const senderUserId=req.user?.id;
         console.log(senderUserId)
         const receiverUserId=req.params.id
@@ -41,11 +42,20 @@ export class friendController {
       async acceptRequest(req:Request,res:Response){
         try{
           const friendId=req.params.id
-          const acceptedRequests = await friendService.accepted(friendId)
-         res.send("ok")
-
-        }catch(error){
-
+          const userId = req?.user?.id
+          console.log(userId,'userid')
+          const acceptedRequests = await friendService.accepted(friendId,userId)
+         res.status(StatusCodes.SUCCESS).json({
+          status:true,
+          message:Message.updated,
+          data:acceptedRequests
+         })
+          
+        }catch(error:any){
+          res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            status:false,
+            message:error.message,
+          })
         }
       }
     }

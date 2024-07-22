@@ -1,8 +1,8 @@
-import { Column, ManyToOne, Entity, JoinColumn, OneToMany } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import Base from '../base.entity';
 import { User } from '../user/user.entity';
-import Comment from '../comment.entity'
-import { NoteMedia } from './notesMedia';
+import Comment from '../comment.entity';
+import NoteMedia from './notesMedia.entity';
 @Entity('notes')
 export class Notes extends Base {
   @Column()
@@ -11,16 +11,13 @@ export class Notes extends Base {
   @Column()
   content: string;
 
-  @ManyToOne(() => User, (user) =>   user.notes)
+  @ManyToOne(() => User, (user) => user.notes)
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @OneToMany(()=>Comment,(comment)=>comment.note)
-  comment:Comment[]
+  @OneToMany(() => Comment, (comment) => comment.note)
+  comments: Comment[];
 
-  @OneToMany(()=>NoteMedia,(noteMedia)=>noteMedia.notes)
-  postImage:Notes[]
-
+  @OneToMany(() => NoteMedia, (noteMedia) => noteMedia.note)
+  noteMedia: NoteMedia[];
 }
-
-export default Notes;

@@ -4,22 +4,31 @@ import notesService from '../services/notes.service'
 import { NotesDTO, UpdateNotesDTO } from '../dto/notes.dto'
 import { Message } from '../constant/messages'
 import HttpException from '../utils/HttpException.utils'
-
+import AppError from '../utils/HttpException.utils'
 export class NotesController {
   async create(req: Request, res: Response) {
-    const userId = req.user?.id
-   
-    console.log(userId, 'userId')
-    if (!userId) {
-      return res.status(StatusCodes.UNAUTHORIZED).json({
-        status: false,
-        message: 'User not authenticated',
-      })
-    }
-    const notesDTO: NotesDTO = req.body
     try {
-      const data=await notesService.create(userId, notesDTO)
-      console.log(data,'dataa')
+      if (req?.files?.length === 0) throw AppError.badRequest('Sorry file couldnot be uploaded')
+      console.log(req?.files?.length)
+      const img = req?.files?.map((file: any) => {
+        return {
+          name: file?.filename,
+          mimiType: file?.mimetype,
+          type: req.body?.type,
+        }
+      })
+
+      const userId = req.user?.id
+      if (!userId) {
+        return res.status(StatusCodes.UNAUTHORIZED).json({
+          status: false,
+          message: 'User not authenticated',
+        })
+      }
+      const notesDTO: NotesDTO = req.body
+
+      const data = await notesService.create(userId, notesDTO, img)
+
       res.status(StatusCodes.CREATED).json({
         status: true,
         message: Message.created,
@@ -32,6 +41,7 @@ export class NotesController {
       })
     }
   }
+
   async getOne(req: Request, res: Response) {
     const userId = req.user?.id
     if (!userId) {
@@ -70,7 +80,7 @@ export class NotesController {
       })
     }
     const updateNotesDTO: UpdateNotesDTO = req.body
-    try {  
+    try {
       const updatedNote = await notesService.update(userId, noteId, updateNotesDTO)
       res.status(StatusCodes.SUCCESS).json({
         status: true,
@@ -84,7 +94,7 @@ export class NotesController {
       })
     }
   }
-  async delete (req:Request,res:Response){
+  async delete(req: Request, res: Response) {
     console.log('ya chai aaipugo hai')
     const userId = req.user?.id
     const noteId = req.params.id
@@ -95,18 +105,17 @@ export class NotesController {
         message: Message.notAuthorized,
       })
     }
-    try{
-      const deleteNote = await notesService.delete(userId,noteId)
+    try {
+      const deleteNote = await notesService.delete(userId, noteId)
       res.status(StatusCodes.SUCCESS).json({
         status: true,
         message: Message.deleted,
         data: deleteNote,
       })
-
-    }catch(error:any){
+    } catch (error: any) {
       res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-        status:false,
-        message:error.message,
+        status: false,
+        message: error.message,
       })
     }
   }

@@ -1,25 +1,48 @@
 import { AppDataSource } from '../config/database.config'
 import HttpException from '../utils/HttpException.utils'
-import Notes from '../entities/notes.entity'
+import {Notes} from '../entities/note/notes.entity'
 import { User } from '../entities/user/user.entity'
 import { NotesDTO, UpdateNotesDTO } from '../dto/notes.dto'
 import { Message } from '../constant/messages'
+import NoteMedia from '../entities/note/notesMedia.entity'
 
 class NotesService {
   constructor(
     private readonly notesRepo = AppDataSource.getRepository(Notes),
-    private readonly userRepo = AppDataSource.getRepository(User)
+    private readonly userRepo = AppDataSource.getRepository(User),
+    private  readonly imageRepo = AppDataSource.getRepository(NoteMedia)
   ) {}
-  async create(userId: any, data: NotesDTO) {
-    console.log(userId)
-    console.log(data, 'data')
+  async create(userId: any, data: NotesDTO,img :any[]) {
+    console.log(userId,"user ID")
+    console.log("image object")
+ 
+    const auth = await this.userRepo.findBy({id:userId})
+    console.log(auth)
+    if(!auth) throw HttpException.notFound
+
+
     const note = this.notesRepo.create({
       title: data.title,
       content: data.content,
       user: userId,
     })
-    console.log(note)
-    await this.notesRepo.save(note)
+ 
+   const pk= await this.notesRepo.save(note)
+    for(const j of img){
+      const image = this.imageRepo.create({
+        name:j.name,
+        mimetype:j.mimiType,
+        type:j.type,
+        note:pk
+
+      }) 
+      console.log(j)
+      const img=await this.imageRepo.save(image) 
+
+      img.transferImageFromTempTOUploadFolder(note.id,img.type)
+    }
+
+  
 
     return note
   }

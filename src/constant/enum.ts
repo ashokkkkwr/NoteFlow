@@ -4,7 +4,9 @@ export enum Environment {
 }
 export enum MediaType {
   PROFILE = 'PROFILE',
+  POST = 'POST'
 }
+
 export enum Role {
   SUDO_ADMIN = 'SUDO_ADMIN',
   SUPER_ADMIN = 'SUPER_ADMIN',

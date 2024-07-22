@@ -9,17 +9,64 @@ import { Role } from '../constant/enum'
 import HttpException from '../utils/HttpException.utils'
 import { OtpService } from '../services/utils/otp.services'
 import { HashService } from '../services/utils/hash.service'
+import AppError from '../utils/HttpException.utils'
 export class UserAuthController {
   constructor(private readonly hashService = new HashService(),
    private readonly otpService = new OtpService()) {}
   async create(req: Request, res: Response) {
+    if(req?.files?.length ===0)throw AppError.badRequest('sorry file couldnot be uploaded')
+    console.log(req?.files,"iamge details")
+    const img = req?.files?.map((file:any)=>{
+      return{
+        name:file?.filename,
+        mimiType:file?.mimetype,
+        type:req.body?.type,
+      }
+    })
     const bodyRole = req.body?.role
     if (bodyRole === Role.SUDO_ADMIN) throw HttpException.forbidden(Message.notAuthorized)
-    await userService.create(req.body as UserDTO)
+    await userService.create(req.body as UserDTO,img)
     res.status(StatusCodes.CREATED).json({
       status: true,
       message: Message.created,
     })
+  }
+
+  async signup(req:Request,res:Response){
+    if(req?.files?.length ===0)throw AppError.badRequest('sorry file couldnot be uploaded')
+      console.log(req?.files,"iamge details")
+      const img = req?.files?.map((file:any)=>{
+        return{
+          name:file?.filename,
+          mimiType:file?.mimetype,
+          type:req.body?.type,
+        }
+      })
+      const bodyRole = req.body?.role
+      if (bodyRole === Role.SUDO_ADMIN) throw HttpException.forbidden(Message.notAuthorized)
+      await userService.create(req.body as UserDTO,img)
+      res.status(StatusCodes.CREATED).json({
+        status: true,
+        message: Message.created,
+      })
+  }
+  async update(req:Request,res:Response){
+    if(req?.files?.length ===0)throw AppError.badRequest('sorry file couldnot be uploaded')
+      const img = req?.files?.map((file:any)=>{
+        return{
+          name:file?.filename,
+          mimiType:file?.mimetype,
+          type:req.body?.type,
+        }
+      })
+      const bodyRole = req.body?.role
+      const userId = req.params.id
+      if (bodyRole === Role.SUDO_ADMIN) throw HttpException.forbidden(Message.notAuthorized)
+      await userService.update(req.body as UserDTO,img,userId)
+      res.status(StatusCodes.CREATED).json({
+        status: true,
+        message: Message.created,
+      })
   }
   async getAll(req: Request, res: Response) {
     const data = await userService.getAll()
@@ -30,7 +77,24 @@ export class UserAuthController {
       data: data,
     })
   }
-
+  async getOne(req:Request,res:Response){
+    const id = req.params.id
+    const data = await userService.getById(id)
+    res.status(StatusCodes.SUCCESS).json({
+      status:true,
+      message:Message.fetched,
+      data:data
+    })
+  }
+  async delete(req:Request,res:Response){
+    const id = req.params.id
+    const data = await userService.delete(id)
+    res.status(StatusCodes.SUCCESS).json({
+      status:true,
+      message:Message.deleted,
+      data:data
+    })
+  }
   async login(req: Request, res: Response) {
     const data = await authService.login(req.body)
     const tokens = webTokenService.generateTokens(
@@ -58,33 +122,8 @@ export class UserAuthController {
       message: Message.loginSuccessfully,
     })
   }
-  async verifyEmail(req: Request, res: Response) {
-    try{
-    console.log(req.body)
-    const user = await authService.verifyEmail(req.body.email)
-    console.log(user,"user from verify")
-    const otp = await this.otpService.generateOtp()
-    console.log(otp,"otp")
-    const expires = Date.now()+60000*5
-    //payload is string
-    const payload=`${req?.body?.email}.${otp}.${expires}`
-    const hash = this.hashService.hashOtp(payload)
-    const token = `${hash}.${expires}`
-
-    await authService.setToken(user.id,token)
-    await this.otpService.sendPasswordResetOtpMail({
-      email:req.body.email,
-      otp:`${otp}`
-    })
-    res.status(StatusCodes.SUCCESS).json({
-      status:true,
-      message:Message.emailSent,
-    })
-  }catch(error:any){
-    throw HttpException.badRequest(error.message)
-  }
 
     
 
   }
-}
+

@@ -37,6 +37,10 @@ export class UserDetailsDTO {
   @IsNotEmpty()
   @IsDefined()
   phone_number: string
+
+  @IsNotEmpty()
+  @IsDefined()
+  type:string
 }
 
 export class UserDTO extends UserDetailsDTO {
