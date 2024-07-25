@@ -11,132 +11,122 @@ class UserService {
     private readonly UserRepo = AppDataSource.getRepository(User),
     private readonly DetailsRepo = AppDataSource.getRepository(UserDetails),
     private readonly bcryptService = new BcryptService(),
-    private readonly MediaRepo = AppDataSource.getRepository(UserMedia),
-
+    private readonly MediaRepo = AppDataSource.getRepository(UserMedia)
   ) {}
 
-  async create(data: UserDTO,img:any[]): Promise<string> {
-
+  async create(data: UserDTO, img: any[]): Promise<string> {
     try {
-      
       const alreadyExists = await this.UserRepo.findOne({
         where: { email: data.email },
       })
       const password = await this.bcryptService.hash(data.password)
       if (alreadyExists) throw HttpException.badRequest(` Email already in use`)
-       
-        const user = this.UserRepo.create({
-          email:data.email,
-          password:password,
-          role:data.role
-        })
+
+      const user = this.UserRepo.create({
+        email: data.email,
+        password: password,
+        role: data.role,
+      })
 
       const users = await this.UserRepo.save(user)
-      const details =  this.DetailsRepo.create({
-
-        first_name:data.first_name,
-        middle_name:data.middle_name,
-        last_name:data.last_name,
-        phone_number:data.last_name,
-        user:user
+      const details = this.DetailsRepo.create({
+        first_name: data.first_name,
+        middle_name: data.middle_name,
+        last_name: data.last_name,
+        phone_number: data.last_name,
+        user: user,
       })
-      const userDetails= await this.DetailsRepo.save(details)
-      
-      for (const j of img){
+      const userDetails = await this.DetailsRepo.save(details)
+
+      for (const j of img) {
         const image = this.MediaRepo.create({
-          name:j.name,
-          mimetype:j.mimiType,
-          type:j.type,
-          UserMedia:userDetails
+          name: j.name,
+          mimetype: j.mimiType,
+          type: j.type,
+          UserMedia: userDetails,
         })
-        console.log(j.name,"this is image detials")
+        console.log(j.name, 'this is image detials')
         const img = await this.MediaRepo.save(image)
-        img.transferImageFromTempTOUploadFolder(details.id,img.type)
+        img.transferImageFromTempTOUploadFolder(details.id, img.type)
       }
 
-
-
       return Message.created
-
-
-
-
     } catch (error: any) {
       throw HttpException.badRequest(error.message)
     }
-  }async update(data: UserDTO, img: any[], userId: string) {
+  }
+
+
+  async update(data: UserDTO, img: any[], userId: string) {
     try {
       // Find the existing user
       const user = await this.UserRepo.findOne({
         where: { id: userId },
-        relations: ["details"] // Ensure we fetch related details
-      });
-  
+        relations: ['details'], // Ensure we fetch related details
+      })
+
       if (!user) {
-        throw new Error(`User with ID ${userId} not found`);
+        throw new Error(`User with ID ${userId} not found`)
       }
-      user.email = data.email;
-      user.role = data.role;
-  
-      const updatedUser = await this.UserRepo.save(user);
-  
-      let userDetails = user.details;
-  
+      user.email = data.email
+      user.role = data.role
+
+      const updatedUser = await this.UserRepo.save(user)
+
+      let userDetails = user.details
+
       if (!userDetails) {
-        userDetails = this.DetailsRepo.create();
-        userDetails.user = updatedUser;
+        userDetails = this.DetailsRepo.create()
+        userDetails.user = updatedUser
       }
-      userDetails.first_name = data.first_name;
-      userDetails.middle_name = data.middle_name;
-      userDetails.last_name = data.last_name;
-      userDetails.phone_number = data.phone_number;
-  
-      const updatedUserDetails = await this.DetailsRepo.save(userDetails);
-  
-      // Delete existing media entries related to the user details
-      await this.MediaRepo.delete({ UserMedia: updatedUserDetails });
-  
+      userDetails.first_name = data.first_name
+      userDetails.middle_name = data.middle_name
+      userDetails.last_name = data.last_name
+      userDetails.phone_number = data.phone_number
+
+      const updatedUserDetails = await this.DetailsRepo.save(userDetails)
+
+      await this.MediaRepo.delete({ UserMedia: updatedUserDetails })
+
       // Add new media entries
       for (const j of img) {
         const image = this.MediaRepo.create({
           name: j.name,
-          mimetype: j.mimiType, 
+          mimetype: j.mimiType,
           type: j.type,
-          UserMedia: updatedUserDetails
-        });
-        
+          UserMedia: updatedUserDetails,
+        })
+
         console.log(image)
-        const savedImage = await this.MediaRepo.save(image);
-        savedImage.transferImageFromTempTOUploadFolder(updatedUserDetails.id, savedImage.type);
+        const savedImage = await this.MediaRepo.save(image)
+        savedImage.transferImageFromTempTOUploadFolder(updatedUserDetails.id, savedImage.type)
       }
-  
-      return { success: true, message: 'Update successful' };
+
+      return { success: true, message: 'Update successful' }
     } catch (error: any) {
-      console.error('Error in update function:', error.message);
+      console.error('Error in update function:', error.message)
       return {
         success: false,
         message: 'Error occurred',
-        originalError: error.message
-      };
+        originalError: error.message,
+      }
     }
   }
-  
-  
+
   async getAll() {
     try {
       return await this.UserRepo.createQueryBuilder('user')
         .leftJoinAndSelect('user.details', 'details')
         .leftJoinAndSelect('details.profileImage', 'profileImage')
-        .getMany();
+        .getMany()
     } catch (error: any) {
-      throw HttpException.badRequest(error.message);
+      throw HttpException.badRequest(error.message)
     }
   }
-  
+
   async getById(id: string) {
     const query = this.UserRepo.createQueryBuilder('user').where('user.id=:id', { id })
-    query.leftJoinAndSelect('user.details', 'details')
-      .leftJoinAndSelect('details.profileImage', 'profileImage')
+    query.leftJoinAndSelect('user.details', 'details').leftJoinAndSelect('details.profileImage', 'profileImage')
 
     const user = await query.getOne()
     if (!user) throw HttpException.notFound(Message.notFound)
@@ -148,7 +138,7 @@ class UserService {
     const user = await query.getOne()
     if (!user) throw HttpException.notFound(Message.notFound)
     await this.UserRepo.remove(user)
-    return {message:"User deleted successfully"}
+    return { message: 'User deleted successfully' }
   }
 }
 export default new UserService()

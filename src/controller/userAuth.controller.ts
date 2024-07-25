@@ -96,31 +96,40 @@ export class UserAuthController {
     })
   }
   async login(req: Request, res: Response) {
-    const data = await authService.login(req.body)
-    const tokens = webTokenService.generateTokens(
-      {
-        id: data.id,
-      },
-      data.role
-    )
-    res.status(StatusCodes.SUCCESS).json({
-      data: {
-        user: {
+    try{
+      const data = await authService.login(req.body)
+    
+      const tokens = webTokenService.generateTokens(
+        {
           id: data.id,
-          email: data.email,
-          details: {
-            firstName: data.details.first_name,
-            lastName: data.details.last_name,
-            phoneNumber: data.details.phone_number,
+        },
+        data.role
+      )
+      res.status(StatusCodes.SUCCESS).json({
+        data: {
+          user: {
+            id: data.id,
+            email: data.email,
+            details: {
+              firstName: data.details.first_name,
+              lastName: data.details.last_name,
+              phoneNumber: data.details.phone_number,
+            },
+          },
+          tokens: {
+            accessToken: tokens.accessToken,
+            refreshToke: tokens.refreshToken,
           },
         },
-        tokens: {
-          accessToken: tokens.accessToken,
-          refreshToke: tokens.refreshToken,
-        },
-      },
-      message: Message.loginSuccessfully,
-    })
+        message: Message.loginSuccessfully,
+      })
+    }catch (error: any) {
+      res.status(error.status || StatusCodes.INTERNAL_SERVER_ERROR).json({
+        status: false,
+        message: error.message,
+      })
+    }
+
   }
 
     

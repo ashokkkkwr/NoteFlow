@@ -4,7 +4,6 @@ import {response, type Request, type Response} from 'express'
 import {Message} from '../constant/messages'
 import friendService from "../services/friend.service";
 
-
 export class friendController {
     async addFriend(req:Request, res:Response) {
       

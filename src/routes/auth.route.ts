@@ -8,5 +8,5 @@ const userAuthController = new UserAuthController()
 
 
 const router = express.Router()
-router.post('/',RequestValidator.validate(LoginDTO),catchAsync(userAuthController.login))
+router.post('/',catchAsync(userAuthController.login))
 export default router
