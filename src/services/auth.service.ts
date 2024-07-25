@@ -10,6 +10,10 @@ class AuthService {
     private readonly bcryptService = new BcryptService()
   ) {}
   async login(data: User): Promise<User> {
+    if (!data.email || !data.password) {
+      throw HttpException.badRequest('Email and password are required');
+
+    }
     const user = await this.userRepo.findOne({
       where: [
         {
@@ -18,6 +22,7 @@ class AuthService {
       ],
       select: ['id', 'email', 'password'],
     })
+    
     if (!user) throw HttpException.notFound(Message.invalidCredentials)
     console.log(user.password, data.password)
     const isPasswordMatch = await this.bcryptService.compare(data.password, user.password)

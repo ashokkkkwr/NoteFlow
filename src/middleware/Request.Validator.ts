@@ -3,6 +3,7 @@ import { validate, type ValidationError } from 'class-validator'
 import { type NextFunction, type Request, type Response } from 'express'
 import HttpException from '../utils/HttpException.utils'
 import { titleNameToCase } from '../utils/titleToCase'
+import { UserDTO } from '../dto/user.dto'
 
 // * to get the nested object error
 const getValidationMessage = (errors: ValidationError[], message: string[]) => {
@@ -22,8 +23,9 @@ const getValidationMessage = (errors: ValidationError[], message: string[]) => {
 
 export default class RequestValidator {
   static validate = <T extends object>(classInstance: ClassConstructor<T>) => {
+   
     return async (req: Request, res: Response, next: NextFunction) => {
-      // *Convert body to class instance
+  
       const convertedObject = plainToClass(classInstance, req.body)
       // *Validate the class instance
       const validationMessages: string[] = []

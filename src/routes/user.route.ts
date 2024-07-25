@@ -8,11 +8,11 @@ import {UserDTO} from '../dto/user.dto'
 const router: IRouter = Router()
 
 const userAuthController = new UserAuthController()
-router.post('/new-signup',upload.array('files'),catchAsync(userAuthController.))
-router.post('/signup', upload.array('files'),RequestValidator.validate(UserDTO),catchAsync(userAuthController.create))
+// router.post('/new-signup',upload.array('files'),catchAsync(userAuthController.))
+
+router.post('/signup', upload.array('files'),catchAsync(userAuthController.create))
 router.patch('/:id',upload.array('files'),catchAsync(userAuthController.update))
 router.get('/', catchAsync(userAuthController.getAll))
 router.get('/:id',userAuthController.getOne)
 router.delete('/:id',userAuthController.delete)
 export default router
-

@@ -55,4 +55,5 @@ export class UserDTO extends UserDetailsDTO {
   @IsNotEmpty()
   @IsEnum(Role, { message: 'Invalid role' })
   role: Role
+
 }
