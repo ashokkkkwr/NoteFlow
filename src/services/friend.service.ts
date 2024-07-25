@@ -43,19 +43,22 @@ class FriendService {
   }
 
   async friendRequest(receiverUserId: string) {
-    const getAllRequest = await this.friendsRepo.find({
-      where: {
-        receiver_id: receiverUserId,
-      },
-    });
-
-    const listSenderId = getAllRequest.map((item) => item.sender_id);
-
-    for (let i = 0; i < listSenderId.length; i++) {
-      const senderDetails = await UserService.getById(listSenderId[i]);
-      console.log(senderDetails);
+    try{
+      console.log(receiverUserId)
+      const view = await this.friendsRepo.createQueryBuilder('friends')
+      .leftJoinAndSelect('friends.sender','sender')
+      .where('friends.receiver_id=:receiverUserId',{receiverUserId})
+      .getMany()
+      console.log(view)
+      return view
+    }catch(error){
+      throw HttpException.notFound
     }
-  }async accepted(friendId: string, userId: any) {
+
+
+
+  }
+  async accepted(friendId: string, userId: any) {
   const friendRequest = await this.friendsRepo.findOne({
     where: {
       

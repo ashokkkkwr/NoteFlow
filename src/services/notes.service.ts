@@ -58,9 +58,30 @@ class NotesService {
     })
     return notes
   }
+  // async getAll() {
+  //   try {
+  //     return await this.UserRepo.createQueryBuilder('user')
+  //       .leftJoinAndSelect('user.details', 'details')
+  //       .leftJoinAndSelect('details.profileImage', 'profileImage')
+  //       .getMany()
+  //   } catch (error: any) {
+  //     throw HttpException.badRequest(error.message)
+  //   }
+  // }
   async getAll() {
-    const notes = await this.notesRepo.find({})
-    return notes
+    try{
+      return await this.notesRepo.createQueryBuilder('notes')
+      .leftJoinAndSelect('notes.noteMedia','noteMedia')
+      .leftJoinAndSelect('notes.user','user')
+      .leftJoinAndSelect('user.details','details')
+      .leftJoinAndSelect('details.profileImage','profileImage')
+      .getMany()
+    }catch(error:any){
+      throw HttpException.badRequest(error.message)
+    }
+    // const notes = await this.notesRepo.find({  relations: ['user'] })
+
+    // return notes
   }
   async update(userId: string, noteId: string, data: UpdateNotesDTO) {
     // Checks if the note with the given noteId belongs to the user with the token userId
