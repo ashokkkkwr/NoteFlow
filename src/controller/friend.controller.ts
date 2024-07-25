@@ -32,7 +32,13 @@ export class friendController {
         try{
           const receiverUserId=req.user?.id;
           const friendRequests =  await friendService.friendRequest(receiverUserId as string)
-          console.log(friendRequests)
+          
+          res.status(StatusCodes.SUCCESS).json({
+            data: friendRequests,
+            status: true,
+            message: Message.fetched
+            
+          })
  
         }catch(error){
 
