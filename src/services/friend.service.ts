@@ -47,16 +47,49 @@ class FriendService {
       console.log(receiverUserId)
       const view = await this.friendsRepo.createQueryBuilder('friends')
       .leftJoinAndSelect('friends.sender','sender')
+      .leftJoinAndSelect('sender.details','details')
+      .leftJoinAndSelect('details.profileImage','profileImage')
       .where('friends.receiver_id=:receiverUserId',{receiverUserId})
+      .andWhere('friends.status=:status',{status:Status.PENDING})
+
       .getMany()
       console.log(view)
       return view
     }catch(error){
       throw HttpException.notFound
     }
+  }
+ 
+  async viewUser(loggedInUserId: any) {
+    try {
+      const users = await this.userRepo.createQueryBuilder('user')
+        .leftJoinAndSelect('user.details', 'details')
+        .leftJoinAndSelect('details.profileImage', 'profileImage')
+        .where('user.id != :loggedInUserId', { loggedInUserId })
+        .andWhere(qb => {
+          const subQuery = qb.subQuery()
+            .select('friends.sender_id')
+            .from(Friends, 'friends')
+            .where('friends.receiver_id = :loggedInUserId', { loggedInUserId })
+            .andWhere('(friends.status = :statusPending OR friends.status = :statusAccepted)', { statusPending: Status.PENDING, statusAccepted: Status.ACCEPTED })
+            .getQuery();
+          return 'user.id NOT IN ' + subQuery;
+        })
+        .andWhere(qb => {
+          const subQuery = qb.subQuery()
+            .select('friends.receiver_id')
+            .from(Friends, 'friends')
+            .where('friends.sender_id = :loggedInUserId', { loggedInUserId })
+            .andWhere('(friends.status = :statusPending OR friends.status = :statusAccepted)', { statusPending: Status.PENDING, statusAccepted: Status.ACCEPTED })
+            .getQuery();
+          return 'user.id NOT IN ' + subQuery;
+        })
+        .getMany();
 
-
-
+      return users;
+    } catch (error: any) {
+      throw HttpException.badRequest(error.message);
+    }
   }
   async accepted(friendId: string, userId: any) {
   const friendRequest = await this.friendsRepo.findOne({

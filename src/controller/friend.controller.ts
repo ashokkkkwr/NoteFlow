@@ -44,6 +44,22 @@ export class friendController {
 
         }
       }
+      async viewUser(req:Request,res:Response){
+        try{
+         const userId=req.user?.id
+          const users =  await friendService.viewUser(userId as string)
+          
+          res.status(StatusCodes.SUCCESS).json({
+            data: users,
+            status: true,
+            message: Message.fetched
+            
+          })
+ 
+        }catch(error){
+
+        }
+      }
       async acceptRequest(req:Request,res:Response){
         try{
           const friendId=req.params.id
