@@ -59,7 +59,60 @@ class FriendService {
       throw HttpException.notFound
     }
   }
- 
+  // async getFriends(userId: string): Promise<Auth[]> {
+  //   try {
+  //     const allFriends = await this.connectRepo
+  //       .createQueryBuilder('connection')
+  //       .innerJoinAndSelect('connection.sender', 'sender')
+  //       .innerJoinAndSelect('connection.receiver', 'receiver')
+  //       .where('connection.sender_id= :userId OR connection.receiver_id= :userId', { userId })
+  //       .andWhere('connection.status =:status', { status: Status.ACCEPTED })
+  //       .getMany()
+  //     console.log('🚀 ~ ConnectService ~ getFriends ~ allFriends:', allFriends)
+
+  //     const friends: Auth[] = allFriends.map((connection) =>
+  //       connection.sender.id === userId ? connection.receiver : connection.sender
+  //     )
+  //     console.log('🚀 ~ ConnectService ~ getFriends ~ friends:', friends)
+
+  //     return friends
+  //   } catch (error) {
+  //     console.error(error)
+  //     throw new Error('Error fetching friends list')
+  //   }
+  // }
+  async viewFriends(receiverUserId: string) {
+    try {
+      console.log('jpt1');
+  
+      const view = await this.friendsRepo.find({
+        where: [
+          { receiver: { id: receiverUserId }, status: Status.ACCEPTED },
+          { sender: { id: receiverUserId }, status: Status.ACCEPTED },
+        ],
+        relations: [
+          'sender',
+          'receiver',
+          'sender.details',
+          'sender.details.profileImage',
+          'receiver.details',
+          'receiver.details.profileImage',
+        ],
+      });
+  
+  
+      const friends = view.map((friend) =>
+        friend.sender.id === receiverUserId ? friend.receiver : friend.sender
+      );
+  
+      return friends;
+    } catch (error) {
+      console.error('Error:', error);
+      throw new HttpException('Not Found', 404);
+    }
+  }
+  
+  
   async viewUser(loggedInUserId: any) {
     try {
       const users = await this.userRepo.createQueryBuilder('user')
