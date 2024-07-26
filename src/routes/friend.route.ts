@@ -12,6 +12,9 @@ router.use(authorization([Role.USER]))
 
 router.post('/:id',catchAsync(FriendController.addFriend))
 router.get('/',catchAsync(FriendController.viewFriendRequest))
+router.get('/friends',catchAsync(FriendController.viewFriends))
+
 router.patch('/accept-request/:id',catchAsync(FriendController.acceptRequest))
 router.get('/view-user',catchAsync(FriendController.viewUser))
+
 export default router
