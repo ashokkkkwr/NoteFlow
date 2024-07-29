@@ -28,7 +28,7 @@ UserMedia:UserDetails
 
   transferImageFromTempTOUploadFolder(id: string, type: MediaType): void {
     const TEMP_FOLDER_PATH = path.join(getTempFolderPath(), this.name);
-    const UPLOAD_FOLDER_PATH = path.join(getUploadFolderPath(), type.toLowerCase(), id.toString());
+    const UPLOAD_FOLDER_PATH = path.join(getUploadFolderPath(), type.toLowerCase(), this.id.toString());
     !fs.existsSync(UPLOAD_FOLDER_PATH) && fs.mkdirSync(UPLOAD_FOLDER_PATH, { recursive: true });
     fs.renameSync(TEMP_FOLDER_PATH, path.join(UPLOAD_FOLDER_PATH, this.name));
   }
