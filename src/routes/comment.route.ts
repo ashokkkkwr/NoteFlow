@@ -16,5 +16,4 @@ router.post('/:id',RequestValidator.validate(CommentDTO),catchAsync(commentContr
 router.delete('/:id',catchAsync(commentController.deleteComments))
 router.patch('/:id',catchAsync(commentController.updateComment))
 router.get('/:id',catchAsync(commentController.getComments))
-
 export default router

@@ -46,20 +46,35 @@ class CommentService {
     const updatedComment = await this.CommentRepo.save(comment)
     return updatedComment
   }
-  async getComment(postId:string){
-
+  async getComment(postId: string): Promise<Comment[]> {
     const comments = await this.CommentRepo.find({
-// checks where the note (or post) has an id equal to postId.
-      where:{note:{id:postId}},
-      parent:IsNull ,
-/**The relations array specifies related entities to load along with the 
- * main entity. In this case, it tells TypeORM to also load the replies 
- * for each comment. */
-      relations:['replies'],
-    })
-    console.log(comments,"com")
-    return comments
+      where: {
+        note: { id: postId },
+        parent: IsNull(),
+      },
+      relations: ['replies'],
+    });
+
+    // Recursively fetch replies for each comment
+    for (const comment of comments) {
+      await this.loadReplies(comment);
+    }
+
+    return comments;
   }
+
+  private async loadReplies(comment: Comment): Promise<void> {
+    if (comment.replies.length > 0) {
+      for (const reply of comment.replies) {
+        reply.replies = await this.CommentRepo.find({
+          where: { parent: { id: reply.id } },
+          relations: ['replies'],
+        });
+        await this.loadReplies(reply);
+      }
+    }
+  }
+
   async deleteComment(commentId:string){
     const comment = await this.CommentRepo.findOne({where:{id:commentId},relations:['replies']});
     if (!comment) {
