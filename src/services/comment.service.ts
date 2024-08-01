@@ -51,6 +51,7 @@ class CommentService {
     const comments = await this.CommentRepo.find({
 // checks where the note (or post) has an id equal to postId.
       where:{note:{id:postId}},
+      parent:IsNull ,
 /**The relations array specifies related entities to load along with the 
  * main entity. In this case, it tells TypeORM to also load the replies 
  * for each comment. */

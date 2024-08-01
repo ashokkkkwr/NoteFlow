@@ -1,6 +1,6 @@
 import { StatusCodes } from "../constant/statusCodes";
 import HttpException from "../utils/HttpException.utils";
-import {response, type Request, type Response} from 'express'
+import { type Request, type Response} from 'express'
 import {Message} from '../constant/messages'
 import commentService from "../services/comment.service";
 import { CommentDTO } from "../dto/comment.dto";
