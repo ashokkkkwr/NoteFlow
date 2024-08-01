@@ -23,6 +23,7 @@ export class UserAuthController {
         type:req.body?.type,
       }
     })
+
     const bodyRole = req.body?.role
     if (bodyRole === Role.SUDO_ADMIN) throw HttpException.forbidden(Message.notAuthorized)
     await userService.create(req.body as UserDTO,img)
@@ -79,12 +80,26 @@ export class UserAuthController {
   }
   async getOne(req:Request,res:Response){
     const id = req.params.id
+    
     const data = await userService.getById(id)
     res.status(StatusCodes.SUCCESS).json({
       status:true,
       message:Message.fetched,
       data:data
     })
+  }
+  async getByToken(req:Request,res:Response){
+    try{
+    const userId = req.user?.id
+    console.log(userId,'yo chai user ko id')
+    const data = await userService.getById(userId as string)
+    res.status(StatusCodes.SUCCESS).json({
+      status:true,
+      message:Message.fetched,
+      data:data
+    })}catch(error){
+      console.log(error,'yoyyooyoyo')
+    }
   }
   async delete(req:Request,res:Response){
     const id = req.params.id

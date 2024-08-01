@@ -33,7 +33,7 @@ class UserService {
         first_name: data.first_name,
         middle_name: data.middle_name,
         last_name: data.last_name,
-        phone_number: data.last_name,
+        phone_number: data.phone_number,
         user: user,
       })
       const userDetails = await this.DetailsRepo.save(details)
@@ -126,7 +126,8 @@ class UserService {
 
   async getById(id: string) {
     const query = this.UserRepo.createQueryBuilder('user').where('user.id=:id', { id })
-    query.leftJoinAndSelect('user.details', 'details').leftJoinAndSelect('details.profileImage', 'profileImage')
+    query.leftJoinAndSelect('user.details', 'details')
+    .leftJoinAndSelect('details.profileImage', 'profileImage')
 
     const user = await query.getOne()
     if (!user) throw HttpException.notFound(Message.notFound)

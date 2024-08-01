@@ -23,7 +23,7 @@ export class UserDetails extends Base {
   @JoinColumn({ name: 'user_id' })
   user: User
 
-
+  
   @OneToMany(() => UserMedia, (media) => media.UserMedia)
   profileImage: UserMedia[];
 
