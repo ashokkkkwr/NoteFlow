@@ -97,6 +97,23 @@ export class friendController {
           })
         }
       }
+      async deleteRequest(req:Request,res:Response){
+        try{
+          const requestId=req.params.id
+          const deleteRequest = await friendService.delete(requestId)
+          res.status(StatusCodes.SUCCESS).json({
+            status:true,
+            message:Message.updated,
+            data:deleteRequest
+           })
+        }
+        catch(error:any){
+          res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            status:false,
+            message:error.message,
+          })
+        }
+      }
     }
    
 
