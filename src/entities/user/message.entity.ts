@@ -3,8 +3,8 @@ import Base from '../base.entity';
 import { UserDetails } from './details.entity';
 import { Notes } from '../note/notes.entity';
 import { Role, Status } from '../../constant/enum';
-import { Friends } from '../../entities/friends.entity';
-import { Message } from '../chat.entity';  // Import the Message entity
+import { Friends } from '../friends.entity';
+import { Message } from '../message.entity';  // Import the Message entity
 
 @Entity('user')
 export class User extends Base {

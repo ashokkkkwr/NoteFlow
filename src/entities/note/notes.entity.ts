@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import Base from '../base.entity';
-import { User } from '../user/user.entity';
+import { User } from '../user/message.entity';
 import Comment from '../comment.entity';
 import NoteMedia from './notesMedia.entity';
 @Entity('notes')

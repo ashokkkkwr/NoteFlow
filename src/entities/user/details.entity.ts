@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm'
 import Base from '../base.entity'
-import { User } from './user.entity'
+import { User } from './message.entity'
 import UserMedia from './userMedia.entity'
 @Entity('user_details')
 export class UserDetails extends Base {
