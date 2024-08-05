@@ -1,9 +1,10 @@
-import { UserDetails } from './details.entity';
-import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
+import { Entity, Column, OneToMany, OneToOne, JoinColumn } from 'typeorm';
 import Base from '../base.entity';
-import {Notes} from '../note/notes.entity';
-import { Role } from '../../constant/enum';
+import { UserDetails } from './details.entity';
+import { Notes } from '../note/notes.entity';
+import { Role, Status } from '../../constant/enum';
 import { Friends } from '../../entities/friends.entity';
+import { Message } from '../chat.entity';  // Import the Message entity
 
 @Entity('user')
 export class User extends Base {
@@ -14,6 +15,7 @@ export class User extends Base {
   password: string;
 
   @OneToOne(() => UserDetails, (details) => details.user, { cascade: true })
+  @JoinColumn()
   details: UserDetails;
 
   @OneToMany(() => Notes, (note) => note.user)
@@ -26,22 +28,21 @@ export class User extends Base {
   })
   role: Role;
 
-  
-
   @OneToMany(() => Friends, (friends) => friends.sender)
   sentFriendRequests: Friends[];
 
   @OneToMany(() => Friends, (friends) => friends.receiver)
   receivedFriendRequests: Friends[];
 
+  @OneToMany(() => Message, (message) => message.sender)
+  sentMessages: Message[];
 
+  @OneToMany(() => Message, (message) => message.receiver)
+  receivedMessages: Message[];
 
+  @Column({ nullable: true })
+  token: string;
 
-  @Column({nullable:true})
-  token:string
-
-  @Column({name:'opt_verified',default:false})
-  otpVerified:boolean
-}   
-
-
+  @Column({ name: 'otp_verified', default: false })
+  otpVerified: boolean;
+}
