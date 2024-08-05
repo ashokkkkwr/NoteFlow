@@ -40,9 +40,6 @@ export class User extends Base {
   @OneToMany(()=>Message,(message)=>message.receiver)
   receivedMessage:Message[]
 
-
-  
-
   @Column({nullable:true})
   token:string
 
