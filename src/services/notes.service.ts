@@ -1,7 +1,7 @@
 import { AppDataSource } from '../config/database.config'
 import HttpException from '../utils/HttpException.utils'
 import {Notes} from '../entities/note/notes.entity'
-import { User } from '../entities/user/user.entity'
+import { User } from '../entities/user/message.entity'
 import { NotesDTO, UpdateNotesDTO } from '../dto/notes.dto'
 import { Message } from '../constant/messages'
 import NoteMedia from '../entities/note/notesMedia.entity'

@@ -1,6 +1,6 @@
 import { AppDataSource } from '../config/database.config'
 import { UserDetails } from '../entities/user/details.entity'
-import { User } from '../entities/user/user.entity'
+import { User } from '../entities/user/message.entity'
 import { Message } from '../constant/messages'
 import { UserDTO } from '../dto/user.dto'
 import HttpException from '../utils/HttpException.utils'

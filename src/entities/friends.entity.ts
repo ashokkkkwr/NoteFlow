@@ -1,7 +1,7 @@
 import { Column, Entity, ManyToOne, JoinColumn } from 'typeorm';
 import Base from './base.entity';
 import { Status } from '../constant/enum';
-import { User } from './user/user.entity';
+import { User } from './user/message.entity';
 
 @Entity('friends')
 export class Friends extends Base {

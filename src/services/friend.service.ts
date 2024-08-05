@@ -1,17 +1,17 @@
 import { FriendDTO } from '../dto/friend.dto';
 import { AppDataSource } from '../config/database.config';
-import { User } from '../entities/user/user.entity';
+import { User } from '../entities/user/message.entity';
 import { Friends } from '../entities/friends.entity';
 import { Message } from '../constant/messages';
 import UserService from './user.service';
-import{Status}from '../constant/enum'
+import { Status } from '../constant/enum'
 import HttpException from '../utils/HttpException.utils';
 
 class FriendService {
   constructor(
     private readonly userRepo = AppDataSource.getRepository(User),
     private readonly friendsRepo = AppDataSource.getRepository(Friends)
-  ) {}
+  ) { }
 
   async addFriend(senderUserId: any, receiverUserId: string, body: FriendDTO) {
     if (senderUserId === receiverUserId) {
@@ -43,19 +43,19 @@ class FriendService {
   }
 
   async friendRequest(receiverUserId: string) {
-    try{
+    try {
       console.log(receiverUserId)
       const view = await this.friendsRepo.createQueryBuilder('friends')
-      .leftJoinAndSelect('friends.sender','sender')
-      .leftJoinAndSelect('sender.details','details')
-      .leftJoinAndSelect('details.profileImage','profileImage')
-      .where('friends.receiver_id=:receiverUserId',{receiverUserId})
-      .andWhere('friends.status=:status',{status:Status.PENDING})
+        .leftJoinAndSelect('friends.sender', 'sender')
+        .leftJoinAndSelect('sender.details', 'details')
+        .leftJoinAndSelect('details.profileImage', 'profileImage')
+        .where('friends.receiver_id=:receiverUserId', { receiverUserId })
+        .andWhere('friends.status=:status', { status: Status.PENDING })
 
-      .getMany()
+        .getMany()
       console.log(view)
       return view
-    }catch(error){
+    } catch (error) {
       throw HttpException.notFound
     }
   }
@@ -84,7 +84,7 @@ class FriendService {
   async viewFriends(receiverUserId: string) {
     try {
       console.log('jpt1');
-  
+
       const view = await this.friendsRepo.find({
         where: [
           { receiver: { id: receiverUserId }, status: Status.ACCEPTED },
@@ -99,20 +99,20 @@ class FriendService {
           'receiver.details.profileImage',
         ],
       });
-  
-  
+
+
       const friends = view.map((friend) =>
         friend.sender.id === receiverUserId ? friend.receiver : friend.sender
       );
-  
+
       return friends;
     } catch (error) {
       console.error('Error:', error);
       throw new HttpException('Not Found', 404);
     }
   }
-  
-  
+
+
   async viewUser(loggedInUserId: any) {
     try {
       const users = await this.userRepo.createQueryBuilder('user')
@@ -145,24 +145,36 @@ class FriendService {
     }
   }
   async accepted(friendId: string, userId: any) {
-  const friendRequest = await this.friendsRepo.findOne({
-    where: {
-      
-      receiver_id: userId,
-    },
-  });
-  console.log(friendRequest,'checking the reuqest')
+    const friendRequest = await this.friendsRepo.findOne({
+      where: {
 
-  if (!friendRequest) {
-    throw  HttpException.notFound
+        receiver_id: userId,
+      },
+    });
+    console.log(friendRequest, 'checking the reuqest')
+
+    if (!friendRequest) {
+      throw HttpException.notFound
+    }
+
+
+    friendRequest.status = Status.ACCEPTED;
+    await this.friendsRepo.save(friendRequest);
+
+    return friendRequest;
   }
-
- 
-  friendRequest.status = Status.ACCEPTED;
-  await this.friendsRepo.save(friendRequest);
-
-  return friendRequest;
-}
+  async delete(requestId: string) {
+    const findRequest = await this.friendsRepo.findOne({
+      where: {
+        id: requestId
+      }
+    })
+    if (findRequest) {
+      this.friendsRepo.delete(requestId)
+    } else {
+      throw HttpException.notFound
+    }
+  }
 
 }
 
