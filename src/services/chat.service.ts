@@ -1,5 +1,5 @@
 import { AppDataSource } from "../config/database.config";
-import { User } from "../entities/user/message.entity";
+import { User } from "../entities/user/user.entity";
 import { Message } from "../entities/message.entity";
 import { Status } from "../constant/enum";
 import HttpException from "../utils/HttpException.utils";

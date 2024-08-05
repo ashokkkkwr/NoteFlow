@@ -1,6 +1,6 @@
 import HttpException from '../utils/HttpException.utils'
 import { AppDataSource } from '../config/database.config'
-import { User } from '../entities/user/message.entity'
+import { User } from '../entities/user/user.entity'
 import { Message } from '../constant/messages'
 import BcryptService from '../utils/bcryptService'
 import userService from './user.service'
