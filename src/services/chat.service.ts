@@ -25,5 +25,11 @@ class chatService{
 
     return message;
   }
+  async getMessages(userId:string){
+    return await this.messageRepo.find({
+      where:[{sender_id:userId},{receiver_id:userId}],
+      relations:['sender','receiver']
+    })
+  }
 }
 export default new chatService()
