@@ -1,6 +1,6 @@
 import { FriendDTO } from '../dto/friend.dto';
 import { AppDataSource } from '../config/database.config';
-import { User } from '../entities/user/message.entity';
+import { User } from '../entities/user/user.entity';
 import { Friends } from '../entities/friends.entity';
 import { Message } from '../constant/messages';
 import UserService from './user.service';
