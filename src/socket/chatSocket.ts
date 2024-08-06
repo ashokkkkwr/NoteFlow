@@ -4,6 +4,7 @@ import HttpException from '../utils/HttpException.utils'
 import { Message } from '../constant/messages'
 import { DotenvConfig } from '../config/env.config'
 import webTokenService from '../utils/webToken.service'
+import userService from '../services/user.service'
 
 export class ChatSocket {
   async setupSocket(server: any) {
@@ -44,16 +45,33 @@ export class ChatSocket {
       socket.join(userId)
 
       socket.on('sendMessage', async (data) => {
-        const  content  = data.message
-         const receiverId= data.receiverId
-         console.log(content,"yo chai content ho hai")
-
-
-        console.log(data)
+      
+        const content = data.content
+        const receiverId = data.receiverId
         try {
+          const sender = await userService.getById(userId)
           const chatMessage = await chatService.sendMessage(userId, receiverId, content)
+          const fullMessage = {
+            ...chatMessage,
+            sender: {
+              details: {
+                first_name: sender.details.first_name,
+                profileImage: sender.details.profileImage
+              }
+            },
+            receiver: {
+              details: {
+                profileImage: data.receiverProfileImage 
+              }
+            }
+          }
+          io.to(receiverId).emit('receiveMessage', fullMessage)
+          socket.to(receiverId).emit('messageNotification',{
+            senderId: userId,
+            content,
+            senderProfileImage: sender.details.profileImage[0]?.path
+          })
 
-          io.to(receiverId).emit('receiveMessage', chatMessage)
         } catch (error) {
           console.error('Error sending message:', error)
         }
