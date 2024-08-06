@@ -25,11 +25,30 @@ class chatService{
 
     return message;
   }
-  async getMessages(userId:string){
+  async getMessages(userId: string, receiverId: string) {
     return await this.messageRepo.find({
-      where:[{sender_id:userId},{receiver_id:userId}],
-      relations:['sender','receiver']
-    })
+      where: [
+        {
+          sender_id: userId,
+          receiver_id: receiverId,
+        },
+        {
+          sender_id: receiverId,
+          receiver_id: userId,
+        },
+      ],
+      relations: [
+        'sender',
+        'receiver',
+        'sender.details',
+        'sender.details.profileImage',
+        'receiver.details',
+        'receiver.details.profileImage',
+      ],
+      
+    });
   }
+  
+  
 }
 export default new chatService()

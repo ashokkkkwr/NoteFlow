@@ -41,19 +41,23 @@ export class ChatSocket {
       console.log(`User connected: ${socket.id}`)
       const userId = socket.data.user.id
 
-      // Join a room based on userId for direct messaging
       socket.join(userId)
 
       socket.on('sendMessage', async (data) => {
-        const { receiverId, content } = data
+        const  content  = data.message
+         const receiverId= data.receiverId
+         console.log(content,"yo chai content ho hai")
+
+
+        console.log(data)
         try {
           const chatMessage = await chatService.sendMessage(userId, receiverId, content)
+
           io.to(receiverId).emit('receiveMessage', chatMessage)
         } catch (error) {
           console.error('Error sending message:', error)
         }
       })
-
       socket.on('disconnect', () => {
         console.log(`User disconnected: ${socket.id}`)
       })
