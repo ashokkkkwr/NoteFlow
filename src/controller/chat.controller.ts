@@ -29,8 +29,9 @@ export class ChatController{
     }
     async getMessages(req:Request,res:Response){
         const userId=req.user?.id;
+        const receiverId=req.params.id
         try {
-            const messages = await chatService.getMessages(userId as string);
+            const messages = await chatService.getMessages(userId as string, receiverId);
             res.status(StatusCodes.SUCCESS).json({
               status: true,
               message: 'Messages fetched',
