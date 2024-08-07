@@ -44,4 +44,20 @@ export class ChatController{
             });
           }
         }
+        async markAsRead(req:Request,res:Response){
+          const chatId=req.params.id
+          try{
+            const read= await chatService.read(chatId);
+            res.status(StatusCodes.SUCCESS).json({
+              status:true,
+              message:'Message Updated',
+              data:read
+            })
+          }catch(error:any){
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+              status:false,
+              message:error.message
+            })
+          }
+        }
     }

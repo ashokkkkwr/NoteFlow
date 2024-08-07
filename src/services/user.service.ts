@@ -59,10 +59,9 @@ class UserService {
 
   async update(data: UserDTO, img: any[], userId: string) {
     try {
-      // Find the existing user
       const user = await this.UserRepo.findOne({
         where: { id: userId },
-        relations: ['details'], // Ensure we fetch related details
+        relations: ['details'], 
       })
 
       if (!user) {

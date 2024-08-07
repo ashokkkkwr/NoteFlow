@@ -7,6 +7,10 @@ export class Message extends Base {
   @Column()
   content: string;
 
+  @Column({default:false,nullable:true})
+  read:boolean;
+
+
   @ManyToOne(() => User, (user) => user.sentMessage)
   @JoinColumn({ name: 'sender_id' })
   sender: User;
