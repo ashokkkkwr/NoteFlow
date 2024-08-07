@@ -13,7 +13,6 @@ export class ChatSocket {
         origin: '*',
       },
     })
-
     // Middleware to authenticate Socket.io connections
     io.use((socket, next) => {
       const token = socket.handshake.auth.token
@@ -37,7 +36,6 @@ export class ChatSocket {
         }
       }
     })
-
     io.on('connection', (socket) => {
       console.log(`User connected: ${socket.id}`)
       const userId = socket.data.user.id
@@ -61,7 +59,8 @@ export class ChatSocket {
             },
             receiver: {
               details: {
-                profileImage: data.receiverProfileImage 
+                profileImage: data.receiverProfileImage,
+
               }
             }
           }
@@ -69,9 +68,9 @@ export class ChatSocket {
           socket.to(receiverId).emit('messageNotification',{
             senderId: userId,
             content,
-            senderProfileImage: sender.details.profileImage[0]?.path
+            senderProfileImage: sender.details.profileImage[0]?.path,
+            senderFirstName:sender.details.first_name
           })
-
         } catch (error) {
           console.error('Error sending message:', error)
         }
@@ -82,3 +81,4 @@ export class ChatSocket {
     })
   }
 }
+

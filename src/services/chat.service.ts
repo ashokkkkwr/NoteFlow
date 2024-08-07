@@ -48,6 +48,21 @@ class chatService{
       
     });
   }
+  async read(chatId:string){
+    const message= await this.messageRepo.findOne({
+      where:[
+        {
+          id:chatId
+        }
+      ]
+
+    })
+    if(!message){
+      throw new Error(`Not found`)
+    }
+    message.read=true
+    await this.messageRepo.save(message);
+  }
   
   
 }
