@@ -1,10 +1,12 @@
 import { UserDetails } from './details.entity';
-import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToMany, OneToMany, OneToOne } from 'typeorm';
 import Base from '../base.entity';
-import {Notes} from '../note/notes.entity';
+import { Notes } from '../note/notes.entity';
 import { Role } from '../../constant/enum';
 import { Friends } from '../../entities/friends.entity';
 import { Message } from '../message.entity';
+import { Room } from '../room.entity';
+
 @Entity('user')
 export class User extends Base {
   @Column()
@@ -26,23 +28,24 @@ export class User extends Base {
   })
   role: Role;
 
-  
-
   @OneToMany(() => Friends, (friends) => friends.sender)
   sentFriendRequests: Friends[];
 
   @OneToMany(() => Friends, (friends) => friends.receiver)
   receivedFriendRequests: Friends[];
 
-  @OneToMany(()=>Message,(message)=>message.sender)
-  sentMessage:Message[];
+  @OneToMany(() => Message, (message) => message.sender)
+  sentMessage: Message[];
 
-  @OneToMany(()=>Message,(message)=>message.receiver)
-  receivedMessage:Message[]
+  @OneToMany(() => Message, (message) => message.receiver)
+  receivedMessage: Message[];
 
-  @Column({nullable:true})
-  token:string
+  @ManyToMany(() => Room, (room) => room.participants)
+  rooms: Room[];
 
-  @Column({name:'opt_verified',default:false})
-  otpVerified:boolean
-}   
+  @Column({ nullable: true })
+  token: string;
+
+  @Column({ name: 'opt_verified', default: false })
+  otpVerified: boolean;
+}

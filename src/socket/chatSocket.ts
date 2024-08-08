@@ -1,10 +1,10 @@
-import { Server } from 'socket.io'
-import chatService from '../services/chat.service'
-import HttpException from '../utils/HttpException.utils'
-import { Message } from '../constant/messages'
-import { DotenvConfig } from '../config/env.config'
-import webTokenService from '../utils/webToken.service'
-import userService from '../services/user.service'
+import { Server } from 'socket.io';
+import chatService from '../services/chat.service';
+import HttpException from '../utils/HttpException.utils';
+import { Message } from '../constant/messages';
+import { DotenvConfig } from '../config/env.config';
+import webTokenService from '../utils/webToken.service';
+import RoomService from '../services/room.service';
 
 export class ChatSocket {
   async setupSocket(server: any) {
@@ -12,74 +12,81 @@ export class ChatSocket {
       cors: {
         origin: '*',
       },
-    })
-    // Middleware to authenticate Socket.io connections
-    // singleton architecture
+    });
+
     io.use((socket, next) => {
-      const token = socket.handshake.auth.token
+      const token = socket.handshake.auth.token;
       if (!token) {
-        return next(HttpException.unauthorized(Message.notAuthorized))
+        return next(HttpException.unauthorized(Message.notAuthorized));
       }
       try {
-        const payload = webTokenService.verify(token, DotenvConfig.ACCESS_TOKEN_SECRET)
+        const payload = webTokenService.verify(token, DotenvConfig.ACCESS_TOKEN_SECRET);
         if (payload) {
-          socket.data.user = payload
-          next()
+          socket.data.user = payload;
+          next();
         } else {
-          return next(HttpException.unauthorized(Message.notAuthorized))
+          return next(HttpException.unauthorized(Message.notAuthorized));
         }
       } catch (err: any) {
         if (err.name === 'TokenExpiredError') {
-          return next(HttpException.unauthorized(Message.tokenExpired))
+          return next(HttpException.unauthorized(Message.tokenExpired));
         } else {
-          return next(HttpException.unauthorized(Message.notAuthorized))
+          return next(HttpException.unauthorized(Message.notAuthorized));
         }
       }
-    })
+    });
+
     io.on('connection', (socket) => {
-      console.log(`User connected: ${socket.id}`)
-      const userId = socket.data.user.id
-      socket.join(userId)
-      socket.on('sendMessage', async (data) => {
-        const content = data.content
-        const receiverId = data.receiverId
-        console.log(receiverId,'receiverId')
-        try {
-          const sender = await userService.getById(userId)
-          const chatMessage = await chatService.sendMessage(userId, receiverId, content)
-          const fullMessage = {
-            ...chatMessage,
-            sender: {
-              details: {
-                first_name: sender.details.first_name,
-                profileImage: sender.details.profileImage
-              }
-            },
-            receiver: {
-              details: {
-                profileImage: data.receiverProfileImage,
+      console.log(`User connected: ${socket.id}`);
+      const userId = socket.data.user.id;
 
-              }
-            }
-          }
-
-          //// room vanne table banau   user 1, user 2  second ra third column id, 
-
-          io.to(receiverId).emit('receiveMessage', fullMessage)
-          socket.to(receiverId).emit('messageNotification', {
-            senderId: userId,
-            content,
-            senderProfileImage: sender.details.profileImage[0]?.path,
-            senderFirstName: sender.details.first_name
-          })
-        } catch (error) {
-          console.error('Error sending message:', error)
+      // Handle joining rooms
+      socket.on('joinRoom', async ({ receiverId }) => {
+        const roomService = new RoomService();
+        const room = await roomService.findOrCreateIfNotExist([userId, receiverId]);
+        if (room) {
+          console.log("sdfhkdsfsdaflsdfdsafhdsfhdsfkldhsafk")
+          socket.join(room.id);
+          console.log(`User ${userId} joined room ${room.id}`);
+        } else {
+          console.error('Room creation or retrieval failed');
         }
-      })
+      });
+
+      // Handle leaving rooms
+      socket.on('leaveRoom', async ({ receiverId }) => {
+        const roomService = new RoomService();
+        const room = await roomService.findRoom([userId, receiverId]);
+        if (room) {
+          socket.leave(room.id);
+          console.log(`User ${userId} left room ${room.id}`);
+        } else {
+          console.error('Room not found');
+        }
+      });
+
+      // Handle sending messages
+      socket.on('sendMessage', async ({ receiverId, content }) => {
+        const roomService = new RoomService();
+        const room = await roomService.findOrCreateIfNotExist([userId, receiverId]);
+
+        if (room) {
+          try {
+            const message = await chatService.sendMessage(userId, receiverId, content, room.id);
+            console.log(`Emitting message to room ${room.id}`);
+            io.to(room.id).emit('message', message); 
+            console.log(`Message sent from ${userId} to ${receiverId}`);
+          } catch (error) {
+            console.error('Error sending message:', error);
+          }
+        } else {
+          console.error('Room creation or retrieval failed');
+        }
+      });
+      // Handle disconnect
       socket.on('disconnect', () => {
-        console.log(`User disconnected: ${socket.id}`)
-      })
-    })
+        console.log(`User disconnected: ${socket.id}`);
+      });
+    });
   }
 }
-
