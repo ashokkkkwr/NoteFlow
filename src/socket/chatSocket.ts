@@ -14,12 +14,12 @@ export class ChatSocket {
       },
     })
     // Middleware to authenticate Socket.io connections
+    // singleton architecture
     io.use((socket, next) => {
       const token = socket.handshake.auth.token
       if (!token) {
         return next(HttpException.unauthorized(Message.notAuthorized))
       }
-
       try {
         const payload = webTokenService.verify(token, DotenvConfig.ACCESS_TOKEN_SECRET)
         if (payload) {
@@ -39,13 +39,11 @@ export class ChatSocket {
     io.on('connection', (socket) => {
       console.log(`User connected: ${socket.id}`)
       const userId = socket.data.user.id
-
       socket.join(userId)
-
       socket.on('sendMessage', async (data) => {
-      
         const content = data.content
         const receiverId = data.receiverId
+        console.log(receiverId,'receiverId')
         try {
           const sender = await userService.getById(userId)
           const chatMessage = await chatService.sendMessage(userId, receiverId, content)
@@ -64,12 +62,15 @@ export class ChatSocket {
               }
             }
           }
+
+          //// room vanne table banau   user 1, user 2  second ra third column id, 
+
           io.to(receiverId).emit('receiveMessage', fullMessage)
-          socket.to(receiverId).emit('messageNotification',{
+          socket.to(receiverId).emit('messageNotification', {
             senderId: userId,
             content,
             senderProfileImage: sender.details.profileImage[0]?.path,
-            senderFirstName:sender.details.first_name
+            senderFirstName: sender.details.first_name
           })
         } catch (error) {
           console.error('Error sending message:', error)

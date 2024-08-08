@@ -18,5 +18,5 @@ const router = express.Router()
 router.use(authentication())
 router.post('/',catchAsync(chatController.sendMessage))
 router.get('/:id',catchAsync(chatController.getMessages))
-router.patch('/markAsRead',catchAsync(chatController.markAsRead))
+router.patch('/markAsRead/:id',catchAsync(chatController.markAsRead))
 export default router
