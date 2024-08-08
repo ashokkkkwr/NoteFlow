@@ -19,8 +19,7 @@ class NotesService {
     const auth = await this.userRepo.findBy({id:userId})
     console.log(auth)
     if(!auth) throw HttpException.notFound
-
-
+    
     const note = this.notesRepo.create({
       title: data.title,
       content: data.content,
