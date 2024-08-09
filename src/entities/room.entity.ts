@@ -12,6 +12,6 @@ export class Room extends Base {
 
     @OneToMany(() => Message, (message) => message.room)
     messages: Message[];
-  
+
     
-}
+    }

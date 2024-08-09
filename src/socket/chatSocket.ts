@@ -73,7 +73,7 @@ export class ChatSocket {
     
                 const senderDetails = await userService.getById(userId);
                 const receiverDetails = await userService.getById(receiverId);
-    
+
                 // Attach sender and receiver details to the message
                 const enrichedMessage = {
                     ...message,
