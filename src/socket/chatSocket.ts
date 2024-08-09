@@ -5,6 +5,7 @@ import { Message } from '../constant/messages';
 import { DotenvConfig } from '../config/env.config';
 import webTokenService from '../utils/webToken.service';
 import RoomService from '../services/room.service';
+import userService from '../services/user.service'
 
 export class ChatSocket {
   async setupSocket(server: any) {
@@ -44,8 +45,15 @@ export class ChatSocket {
       socket.on('joinRoom', async ({ receiverId }) => {
         const roomService = new RoomService();
         const room = await roomService.findOrCreateIfNotExist([userId, receiverId]);
+
         if (room) {
-          console.log("sdfhkdsfsdaflsdfdsafhdsfhdsfkldhsafk")
+           // Leave any other room the user might have joined previously
+      const currentRooms = Array.from(socket.rooms);
+      currentRooms.forEach(roomId => {
+        if (roomId !== socket.id) {  // socket.id is the default room, don't leave it
+          socket.leave(roomId);
+        }
+      });
           socket.join(room.id);
           console.log(`User ${userId} joined room ${room.id}`);
         } else {
@@ -53,36 +61,46 @@ export class ChatSocket {
         }
       });
 
-      // Handle leaving rooms
-      socket.on('leaveRoom', async ({ receiverId }) => {
-        const roomService = new RoomService();
-        const room = await roomService.findRoom([userId, receiverId]);
-        if (room) {
-          socket.leave(room.id);
-          console.log(`User ${userId} left room ${room.id}`);
-        } else {
-          console.error('Room not found');
-        }
-      });
+   
 
-      // Handle sending messages
       socket.on('sendMessage', async ({ receiverId, content }) => {
         const roomService = new RoomService();
         const room = await roomService.findOrCreateIfNotExist([userId, receiverId]);
-
+    
         if (room) {
-          try {
-            const message = await chatService.sendMessage(userId, receiverId, content, room.id);
-            console.log(`Emitting message to room ${room.id}`);
-            io.to(room.id).emit('message', message); 
-            console.log(`Message sent from ${userId} to ${receiverId}`);
-          } catch (error) {
-            console.error('Error sending message:', error);
-          }
+            try {
+                const message = await chatService.sendMessage(userId, receiverId, content, room.id);
+    
+                const senderDetails = await userService.getById(userId);
+                const receiverDetails = await userService.getById(receiverId);
+
+                // Attach sender and receiver details to the message
+                const enrichedMessage = {
+                    ...message,
+                    sender: {
+                        details: {
+                            first_name: senderDetails.details.first_name,
+                            profileImage: senderDetails.details.profileImage,
+                        },
+                    },
+                    receiver: {
+                        details: {
+                            first_name: receiverDetails.details.first_name,
+                            profileImage: receiverDetails.details.profileImage,
+                        },
+                    },
+                };
+    
+                io.to(room.id).emit('message', enrichedMessage);
+                console.log(`Message sent from ${userId} to ${receiverId}`);
+            } catch (error) {
+                console.error('Error sending message:', error);
+            }
         } else {
-          console.error('Room creation or retrieval failed');
+            console.error('Room creation or retrieval failed');
         }
-      });
+    });
+    
       // Handle disconnect
       socket.on('disconnect', () => {
         console.log(`User disconnected: ${socket.id}`);

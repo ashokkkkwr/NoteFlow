@@ -174,6 +174,22 @@ class FriendService {
     } else {
       throw HttpException.notFound
     }
+    return findRequest
+  }
+  async deleteFriend(requestId: string) {
+    const findRequest = await this.friendsRepo.findOne({
+      where: [
+        { receiver_id: requestId },
+        { sender_id: requestId }
+      ]
+    });
+    console.log(findRequest,'friend')
+    if (findRequest) {
+      this.friendsRepo.delete(findRequest.id)
+    } else {
+      throw HttpException.notFound
+    }
+    return findRequest
   }
 
 }

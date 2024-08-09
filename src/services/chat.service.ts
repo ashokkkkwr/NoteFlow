@@ -10,17 +10,17 @@ class ChatService {
   private readonly roomRepo = AppDataSource.getRepository(Room)
 
   async sendMessage(senderId: string, receiverId: string, content: string, roomId: string) {
-    const roomid = await this.roomRepo.findOneBy({id:roomId})
-    console.log(roomid,"yo chai room id ho la...")
-    
+    const roomid = await this.roomRepo.findOneBy({ id: roomId })
+    console.log(roomid, "yo chai room id ho la...")
+
     const sender = await this.userRepo.findOne({ where: { id: senderId } });
     const receiver = await this.userRepo.findOne({ where: { id: receiverId } });
 
-    if(!roomid){
-      throw new HttpException(`Room not found`,404)
+    if (!roomid) {
+      throw new HttpException(`Room not found`, 404)
     }
 
-    if (!sender || !receiver ) {
+    if (!sender || !receiver) {
       throw new HttpException('User not found', 404);
     }
 
@@ -30,15 +30,15 @@ class ChatService {
     message.content = content;
     message.room = roomid;
 
-    const m=await this.messageRepo.save(message);
+    const m = await this.messageRepo.save(message);
     // Save the message with properties directly
-// const savedMessage = await this.messageRepo.save({
-//   sender_id: senderId,
-//   receiver_id: receiverId,
-//   content,
-//   room_id: roomId,
-// });
-    console.log(m,message,"kjhdfsfshjgfsadgfyureftg")
+    // const savedMessage = await this.messageRepo.save({
+    //   sender_id: senderId,
+    //   receiver_id: receiverId,
+    //   content,
+    //   room_id: roomId,
+    // });
+    console.log(m, message, "kjhdfsfshjgfsadgfyureftg")
     return message;
   }
   async getMessages(userId: string, receiverId: string) {
@@ -48,6 +48,10 @@ class ChatService {
         { sender_id: receiverId, receiver_id: userId },
       ],
       relations: ['sender', 'receiver', 'sender.details', 'sender.details.profileImage', 'receiver.details', 'receiver.details.profileImage'],
+      order: {
+        createdAt: 'ASC'
+      }
+
     });
   }
   async readMessage(chatId: string) {

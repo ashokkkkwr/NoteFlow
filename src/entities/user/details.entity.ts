@@ -16,6 +16,13 @@ export class UserDetails extends Base {
   @Column({})
   phone_number: string
 
+  @Column({nullable:true})
+  gender: string
+
+
+  @Column({nullable:true})
+  active_status:boolean
+
   @OneToOne(() => User, (user) => user.details, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
