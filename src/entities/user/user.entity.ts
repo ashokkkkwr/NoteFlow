@@ -28,6 +28,11 @@ export class User extends Base {
   })
   role: Role;
 
+
+  @Column({ name:'active_status', default:false})
+  active_status:boolean
+
+
   @OneToMany(() => Friends, (friends) => friends.sender)
   sentFriendRequests: Friends[];
 
@@ -45,7 +50,7 @@ export class User extends Base {
 
   @Column({ nullable: true })
   token: string;
-
+  
   @Column({ name: 'opt_verified', default: false })
   otpVerified: boolean;
 }

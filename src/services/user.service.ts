@@ -12,7 +12,7 @@ class UserService {
     private readonly DetailsRepo = AppDataSource.getRepository(UserDetails),
     private readonly bcryptService = new BcryptService(),
     private readonly MediaRepo = AppDataSource.getRepository(UserMedia)
-  ) {}
+  ) { }
 
   async create(data: UserDTO, img: any[]): Promise<string> {
     try {
@@ -22,9 +22,9 @@ class UserService {
       const password = await this.bcryptService.hash(data.password)
       if (alreadyExists) throw HttpException.badRequest(` Email already in use`)
 
-      if(!data.email ||!data.password ||!data.first_name ||!data.last_name||!data.phone_number) {
+      if (!data.email || !data.password || !data.first_name || !data.last_name || !data.phone_number) {
         throw HttpException.badRequest(` Please fill all the input fields.`)
-      } 
+      }
       const user = this.UserRepo.create({
         email: data.email,
         password: password,
@@ -59,12 +59,63 @@ class UserService {
     }
   }
 
+  async active(id: string) {
+    try {
+      const user = await this.UserRepo.findOne({
+        where: { id: id }
+      })
+      if (!user) {
+        throw new Error(`User with ID ${id} not found`)
 
+      }
+      user.active_status = true
+      const data=await this.UserRepo.save(user)
+      return {
+         success: true,
+          message: 'Update successful' ,
+          data:data
+        }
+
+    } catch (error: any) {
+      console.error('Error in update function:', error.message)
+      return {
+        success: false,
+        message: 'Error occurred',
+        originalError: error.message,
+      }
+    }
+  }
+  async offline(id:string){
+    try {
+      const user = await this.UserRepo.findOne({
+        where: { id: id }
+      })
+      if (!user) {
+        throw new Error(`User with ID ${id} not found`)
+
+      }
+      user.active_status = false
+      const data=await this.UserRepo.save(user)
+      return {
+         success: true,
+          message: 'Update successful' ,
+          data:data
+        }
+
+    } catch (error: any) {
+      console.error('Error in update function:', error.message)
+      return {
+        success: false,
+        message: 'Error occurred',
+        originalError: error.message,
+      }
+    }
+  }
   async update(data: UserDTO, img: any[], userId: string) {
     try {
       const user = await this.UserRepo.findOne({
         where: { id: userId },
-        relations: ['details'], 
+        relations: ['details'],
       })
 
       if (!user) {
@@ -129,7 +180,7 @@ class UserService {
   async getById(id: string) {
     const query = this.UserRepo.createQueryBuilder('user').where('user.id=:id', { id })
     query.leftJoinAndSelect('user.details', 'details')
-    .leftJoinAndSelect('details.profileImage', 'profileImage')
+      .leftJoinAndSelect('details.profileImage', 'profileImage')
 
     const user = await query.getOne()
     if (!user) throw HttpException.notFound(Message.notFound)

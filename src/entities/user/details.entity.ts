@@ -20,8 +20,7 @@ export class UserDetails extends Base {
   gender: string
 
 
-  @Column({nullable:true})
-  active_status:boolean
+
 
   @OneToOne(() => User, (user) => user.details, {
     onDelete: 'CASCADE',
