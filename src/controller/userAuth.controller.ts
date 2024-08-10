@@ -12,62 +12,61 @@ import { HashService } from '../services/utils/hash.service'
 import AppError from '../utils/HttpException.utils'
 export class UserAuthController {
   constructor(private readonly hashService = new HashService(),
-   private readonly otpService = new OtpService()) {}
+    private readonly otpService = new OtpService()) { }
   async create(req: Request, res: Response) {
-    if(req?.files?.length ===0)throw AppError.badRequest('sorry file couldnot be uploaded')
-    console.log(req?.files,"iamge details")
-    const img = req?.files?.map((file:any)=>{
-      return{
-        name:file?.filename,
-        mimiType:file?.mimetype,
-        type:req.body?.type,
+    if (req?.files?.length === 0) throw AppError.badRequest('Please select a file.')
+    console.log(req?.files, "iamge details")
+    const img = req?.files?.map((file: any) => {
+      return {
+        name: file?.filename,
+        mimiType: file?.mimetype,
+        type: req.body?.type,
       }
     })
 
     const bodyRole = req.body?.role
     if (bodyRole === Role.SUDO_ADMIN) throw HttpException.forbidden(Message.notAuthorized)
-    await userService.create(req.body as UserDTO,img)
+    await userService.create(req.body as UserDTO, img)
     res.status(StatusCodes.CREATED).json({
       status: true,
       message: Message.created,
     })
   }
-
-  async signup(req:Request,res:Response){
-    if(req?.files?.length ===0)throw AppError.badRequest('sorry file couldnot be uploaded')
-      console.log(req?.files,"iamge details")
-      const img = req?.files?.map((file:any)=>{
-        return{
-          name:file?.filename,
-          mimiType:file?.mimetype,
-          type:req.body?.type,
-        }
-      })
-      const bodyRole = req.body?.role
-      if (bodyRole === Role.SUDO_ADMIN) throw HttpException.forbidden(Message.notAuthorized)
-      await userService.create(req.body as UserDTO,img)
-      res.status(StatusCodes.CREATED).json({
-        status: true,
-        message: Message.created,
-      })
+  async signup(req: Request, res: Response) {
+    if (req?.files?.length === 0) throw AppError.badRequest('Please select a file')
+    console.log(req?.files, "iamge details")
+    const img = req?.files?.map((file: any) => {
+      return {
+        name: file?.filename,
+        mimiType: file?.mimetype,
+        type: req.body?.type,
+      }
+    })
+    const bodyRole = req.body?.role
+    if (bodyRole === Role.SUDO_ADMIN) throw HttpException.forbidden(Message.notAuthorized)
+    await userService.create(req.body as UserDTO, img)
+    res.status(StatusCodes.CREATED).json({
+      status: true,
+      message: Message.created,
+    })
   }
-  async update(req:Request,res:Response){
-    if(req?.files?.length ===0)throw AppError.badRequest('sorry file couldnot be uploaded')
-      const img = req?.files?.map((file:any)=>{
-        return{
-          name:file?.filename,
-          mimiType:file?.mimetype,
-          type:req.body?.type,
-        }
-      })
-      const bodyRole = req.body?.role
-      const userId = req.params.id
-      if (bodyRole === Role.SUDO_ADMIN) throw HttpException.forbidden(Message.notAuthorized)
-      await userService.update(req.body as UserDTO,img,userId)
-      res.status(StatusCodes.CREATED).json({
-        status: true,
-        message: Message.created,
-      })
+  async update(req: Request, res: Response) {
+    if (req?.files?.length === 0) throw AppError.badRequest('Please select a file.')
+    const img = req?.files?.map((file: any) => {
+      return {
+        name: file?.filename,
+        mimiType: file?.mimetype,
+        type: req.body?.type,
+      }
+    })
+    const bodyRole = req.body?.role
+    const userId = req.params.id
+    if (bodyRole === Role.SUDO_ADMIN) throw HttpException.forbidden(Message.notAuthorized)
+    await userService.update(req.body as UserDTO, img, userId)
+    res.status(StatusCodes.CREATED).json({
+      status: true,
+      message: Message.created,
+    })
   }
   async getAll(req: Request, res: Response) {
     const data = await userService.getAll()
@@ -78,42 +77,43 @@ export class UserAuthController {
       data: data,
     })
   }
-  async getOne(req:Request,res:Response){
+  async getOne(req: Request, res: Response) {
     const id = req.params.id
-    
+
     const data = await userService.getById(id)
     res.status(StatusCodes.SUCCESS).json({
-      status:true,
-      message:Message.fetched,
-      data:data
+      status: true,
+      message: Message.fetched,
+      data: data
     })
   }
-  async getByToken(req:Request,res:Response){
-    try{
-    const userId = req.user?.id
-    console.log(userId,'yo chai user ko id')
-    const data = await userService.getById(userId as string)
-    res.status(StatusCodes.SUCCESS).json({
-      status:true,
-      message:Message.fetched,
-      data:data
-    })}catch(error){
-      console.log(error,'yoyyooyoyo')
+  async getByToken(req: Request, res: Response) {
+    try {
+      const userId = req.user?.id
+      console.log(userId, 'yo chai user ko id')
+      const data = await userService.getById(userId as string)
+      res.status(StatusCodes.SUCCESS).json({
+        status: true,
+        message: Message.fetched,
+        data: data
+      })
+    } catch (error) {
+      console.log(error, 'yoyyooyoyo')
     }
   }
-  async delete(req:Request,res:Response){
+  async delete(req: Request, res: Response) {
     const id = req.params.id
     const data = await userService.delete(id)
     res.status(StatusCodes.SUCCESS).json({
-      status:true,
-      message:Message.deleted,
-      data:data
+      status: true,
+      message: Message.deleted,
+      data: data
     })
   }
   async login(req: Request, res: Response) {
-    try{
+    try {
       const data = await authService.login(req.body)
-    
+
       const tokens = webTokenService.generateTokens(
         {
           id: data.id,
@@ -138,7 +138,7 @@ export class UserAuthController {
         },
         message: Message.loginSuccessfully,
       })
-    }catch (error: any) {
+    } catch (error: any) {
       res.status(error.status || StatusCodes.INTERNAL_SERVER_ERROR).json({
         status: false,
         message: error.message,
@@ -146,16 +146,16 @@ export class UserAuthController {
     }
 
   }
-  async googleLogin(req:Request,res:Response){
-    try{
-    const googleId=req.body.googleId
-    const data=await authService.googleLogin(googleId)
-    const tokens = webTokenService.generateTokens(
-      {
-        id: data.id,
-      },
-      data.role
-      )  
+  async googleLogin(req: Request, res: Response) {
+    try {
+      const googleId = req.body.googleId
+      const data = await authService.googleLogin(googleId)
+      const tokens = webTokenService.generateTokens(
+        {
+          id: data.id,
+        },
+        data.role
+      )
       res.status(StatusCodes.SUCCESS).json({
         data: {
           user: {
@@ -174,7 +174,7 @@ export class UserAuthController {
         },
         message: Message.loginSuccessfully,
       })
-    }catch(error:any){
+    } catch (error: any) {
       res.status(error.status || StatusCodes.INTERNAL_SERVER_ERROR).json({
         status: false,
         message: error.message,
@@ -183,7 +183,7 @@ export class UserAuthController {
   }
 
 
-    
 
-  }
+
+}
 

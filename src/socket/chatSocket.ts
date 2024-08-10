@@ -60,9 +60,16 @@ export class ChatSocket {
           console.error('Room creation or retrieval failed');
         }
       });
-
-   
-
+       
+      socket.on('typing',async ({receiverId})=>{
+        console.log('typing')
+        const roomService = new RoomService();
+        const room = await roomService.findOrCreateIfNotExist([userId, receiverId]);
+        if(room){
+          io.to(room.id).emit('typing',{userId})
+        }
+      
+      })
       socket.on('sendMessage', async ({ receiverId, content }) => {
         const roomService = new RoomService();
         const room = await roomService.findOrCreateIfNotExist([userId, receiverId]);

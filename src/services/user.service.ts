@@ -22,6 +22,9 @@ class UserService {
       const password = await this.bcryptService.hash(data.password)
       if (alreadyExists) throw HttpException.badRequest(` Email already in use`)
 
+      if(!data.email ||!data.password ||!data.first_name ||!data.last_name||!data.phone_number) {
+        throw HttpException.badRequest(` Please fill all the input fields.`)
+      } 
       const user = this.UserRepo.create({
         email: data.email,
         password: password,
