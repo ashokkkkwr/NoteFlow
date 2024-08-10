@@ -5,7 +5,7 @@ import { Message } from '../constant/messages';
 import { DotenvConfig } from '../config/env.config';
 import webTokenService from '../utils/webToken.service';
 import RoomService from '../services/room.service';
-import userService from '../services/user.service'
+import userService from '../services/user.service';
 
 export class ChatSocket {
   async setupSocket(server: any) {
@@ -37,9 +37,18 @@ export class ChatSocket {
       }
     });
 
-    io.on('connection', (socket) => {
+    io.on('connection', async (socket) => {
       console.log(`User connected: ${socket.id}`);
       const userId = socket.data.user.id;
+
+      // Mark user as active when they connect
+      try {
+        await userService.active(userId);
+        io.emit('statusChange', { userId, active: true }); // Notify all clients about the user's active status
+        console.log(`User ${userId} marked as active`);
+      } catch (error) {
+        console.error('Error marking user as active:', error);
+      }
 
       // Handle joining rooms
       socket.on('joinRoom', async ({ receiverId }) => {
@@ -47,70 +56,79 @@ export class ChatSocket {
         const room = await roomService.findOrCreateIfNotExist([userId, receiverId]);
 
         if (room) {
-           // Leave any other room the user might have joined previously
-      const currentRooms = Array.from(socket.rooms);
-      currentRooms.forEach(roomId => {
-        if (roomId !== socket.id) {  // socket.id is the default room, don't leave it
-          socket.leave(roomId);
-        }
-      });
+          // Leave any other room the user might have joined previously
+          const currentRooms = Array.from(socket.rooms);
+          currentRooms.forEach(roomId => {
+            if (roomId !== socket.id) {  // socket.id is the default room, don't leave it
+              socket.leave(roomId);
+            }
+          });
           socket.join(room.id);
           console.log(`User ${userId} joined room ${room.id}`);
         } else {
           console.error('Room creation or retrieval failed');
         }
       });
-       
-      socket.on('typing',async ({receiverId})=>{
-        console.log('typing')
+
+      // Handle typing event
+      socket.on('typing', async ({ receiverId }) => {
+        console.log('User is typing');
         const roomService = new RoomService();
         const room = await roomService.findOrCreateIfNotExist([userId, receiverId]);
-        if(room){
-          io.to(room.id).emit('typing',{userId})
+        if (room) {
+          io.to(room.id).emit('typing', { userId });
         }
-      
-      })
+      });
+
+      // Handle sending message
       socket.on('sendMessage', async ({ receiverId, content }) => {
         const roomService = new RoomService();
         const room = await roomService.findOrCreateIfNotExist([userId, receiverId]);
-    
-        if (room) {
-            try {
-                const message = await chatService.sendMessage(userId, receiverId, content, room.id);
-    
-                const senderDetails = await userService.getById(userId);
-                const receiverDetails = await userService.getById(receiverId);
 
-                // Attach sender and receiver details to the message
-                const enrichedMessage = {
-                    ...message,
-                    sender: {
-                        details: {
-                            first_name: senderDetails.details.first_name,
-                            profileImage: senderDetails.details.profileImage,
-                        },
-                    },
-                    receiver: {
-                        details: {
-                            first_name: receiverDetails.details.first_name,
-                            profileImage: receiverDetails.details.profileImage,
-                        },
-                    },
-                };
-    
-                io.to(room.id).emit('message', enrichedMessage);
-                console.log(`Message sent from ${userId} to ${receiverId}`);
-            } catch (error) {
-                console.error('Error sending message:', error);
-            }
+        if (room) {
+          try {
+            const message = await chatService.sendMessage(userId, receiverId, content, room.id);
+
+            const senderDetails = await userService.getById(userId);
+            const receiverDetails = await userService.getById(receiverId);
+
+            // Attach sender and receiver details to the message
+            const enrichedMessage = {
+              ...message,
+              sender: {
+                details: {
+                  first_name: senderDetails.details.first_name,
+                  profileImage: senderDetails.details.profileImage,
+                },
+              },
+              receiver: {
+                details: {
+                  first_name: receiverDetails.details.first_name,
+                  profileImage: receiverDetails.details.profileImage,
+                },
+              },
+            };
+
+            io.to(room.id).emit('message', enrichedMessage);
+            console.log(`Message sent from ${userId} to ${receiverId}`);
+          } catch (error) {
+            console.error('Error sending message:', error);
+          }
         } else {
-            console.error('Room creation or retrieval failed');
+          console.error('Room creation or retrieval failed');
         }
-    });
-    
+      });
+
       // Handle disconnect
-      socket.on('disconnect', () => {
+      socket.on('disconnect', async () => {
         console.log(`User disconnected: ${socket.id}`);
+        try {
+          await userService.offline(userId); // Update user's status to offline
+          io.emit('statusChange', { userId, active: false }); // Notify all clients about the user's offline status
+          console.log(`User ${userId} marked as offline`);
+        } catch (error) {
+          console.error('Error marking user as offline:', error);
+        }
       });
     });
   }
