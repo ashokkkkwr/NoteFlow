@@ -46,19 +46,4 @@ export class ChatController {
     }
   }
 
-  async markAsRead(req: Request, res: Response) {
-    const chatId = req.params.id;
-    try {
-      await chatService.readMessage(chatId);
-      res.status(StatusCodes.SUCCESS).json({
-        status: true,
-        message: 'Message Updated',
-      });
-    } catch (error: any) {
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-        status: false,
-        message: error.message,
-      });
-    }
-  }
 }
