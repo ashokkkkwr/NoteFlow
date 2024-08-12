@@ -138,9 +138,7 @@ class UserService {
       userDetails.phone_number = data.phone_number
 
       const updatedUserDetails = await this.DetailsRepo.save(userDetails)
-
       await this.MediaRepo.delete({ UserMedia: updatedUserDetails })
-
       // Add new media entries
       for (const j of img) {
         const image = this.MediaRepo.create({
@@ -149,12 +147,10 @@ class UserService {
           type: j.type,
           UserMedia: updatedUserDetails,
         })
-
         console.log(image)
         const savedImage = await this.MediaRepo.save(image)
         savedImage.transferImageFromTempTOUploadFolder(updatedUserDetails.id, savedImage.type)
       }
-
       return { success: true, message: 'Update successful' }
     } catch (error: any) {
       console.error('Error in update function:', error.message)
@@ -165,7 +161,6 @@ class UserService {
       }
     }
   }
-
   async getAll() {
     try {
       return await this.UserRepo.createQueryBuilder('user')
@@ -176,8 +171,8 @@ class UserService {
       throw HttpException.badRequest(error.message)
     }
   }
-
   async getById(id: string) {
+    console.log(id,"service ko id")
     const query = this.UserRepo.createQueryBuilder('user').where('user.id=:id', { id })
     query.leftJoinAndSelect('user.details', 'details')
       .leftJoinAndSelect('details.profileImage', 'profileImage')

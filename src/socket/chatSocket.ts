@@ -8,6 +8,7 @@ import RoomService from '../services/room.service';
 import userService from '../services/user.service';
 
 export class ChatSocket {
+  private userSockets = new Map();  // Map to track user ID to socket ID
   async setupSocket(server: any) {
     const io = new Server(server, {
       cors: {
@@ -40,7 +41,7 @@ export class ChatSocket {
     io.on('connection', async (socket) => {
       console.log(`User connected: ${socket.id}`);
       const userId = socket.data.user.id;
-
+      this.userSockets.set(userId,socket.id)
       // Mark user as active when they connect
       try {
         await userService.active(userId);
@@ -49,7 +50,6 @@ export class ChatSocket {
       } catch (error) {
         console.error('Error marking user as active:', error);
       }
-
       // Handle joining rooms
       socket.on('joinRoom', async ({ receiverId }) => {
         const roomService = new RoomService();
@@ -68,8 +68,22 @@ export class ChatSocket {
         } else {
           console.error('Room creation or retrieval failed');
         }
-      });
 
+
+
+
+      });
+  
+     // Handle friend request and emit event to specific user
+     socket.on('request', async (receiverId: string) => {
+      const receiverSocketId = this.userSockets.get(receiverId);
+      if (receiverSocketId) {
+        io.to(receiverSocketId).emit('notiReceiver', { receiverId });
+        console.log(`Notification sent to user ${receiverId}`);
+      } else {
+        console.log('Receiver not connected');
+      }
+    });
       // Handle typing event
       socket.on('typing', async ({ receiverId }) => {
         console.log('User is typing');
@@ -79,19 +93,17 @@ export class ChatSocket {
           io.to(room.id).emit('typing', { userId });
         }
       });
-
       // Handle sending message
       socket.on('sendMessage', async ({ receiverId, content }) => {
         const roomService = new RoomService();
         const room = await roomService.findOrCreateIfNotExist([userId, receiverId]);
+        console.log(room,"room ho lalalalalalalalallalalalala")
 
         if (room) {
           try {
             const message = await chatService.sendMessage(userId, receiverId, content, room.id);
-
             const senderDetails = await userService.getById(userId);
             const receiverDetails = await userService.getById(receiverId);
-
             // Attach sender and receiver details to the message
             const enrichedMessage = {
               ...message,
@@ -124,13 +136,30 @@ export class ChatSocket {
           console.log(messageIds);
           const reads = await chatService.readMessages(messageIds);
           console.log(reads, "Messages marked as read");
-      
+
           // Emit the messagesRead event to notify the client that these messages are marked as read
           io.to(socket.id).emit('messagesRead', { messageIds });
         } catch (error) {
           console.error('Error marking messages as read:', error);
         }
       });
+      socket.on('accepted', async ({ id, senderId }) => {
+        try {
+          console.log(id, "id ho la")
+          console.log(senderId, "sender ko chai ID")
+          const receiverDetails = await userService.getById(senderId)
+          const senderDetails = await userService.getById(userId)
+          // console.log(senderDetails,'sender Details')
+          // console.log(receiverDetails,"receiver Details")
+
+          io.to(userId).emit('accept', { receiverDetails, senderDetails })
+
+        } catch (error) {
+          console.log("error haha", error)
+        }
+      })
+
+      
 
       // Handle disconnect
       socket.on('disconnect', async () => {
@@ -143,6 +172,8 @@ export class ChatSocket {
           console.error('Error marking user as offline:', error);
         }
       });
+
+
     });
   }
 }
