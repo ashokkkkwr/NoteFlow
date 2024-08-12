@@ -21,6 +21,4 @@ AppDataSource.initialize()
   })
   .catch((err) => {
     Print.error(`❌ Database connection failure - ${err?.message}`)
-
-    
   })

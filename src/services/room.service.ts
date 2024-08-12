@@ -37,4 +37,5 @@ export default class RoomService {
       .having('COUNT(participants.id) = :participantCount', { participantCount: participants.length })
       .getOne();
   }
+  
 }
