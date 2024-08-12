@@ -3,7 +3,7 @@ import { User } from "../entities/user/user.entity";
 import { Message } from "../entities/message.entity";
 import HttpException from "../utils/HttpException.utils";
 import { Room } from "../entities/room.entity";
-
+import { In } from 'typeorm';
 class ChatService {
   private readonly userRepo = AppDataSource.getRepository(User);
   private readonly messageRepo = AppDataSource.getRepository(Message);
@@ -54,14 +54,26 @@ class ChatService {
 
     });
   }
-  async readMessage(chatId: string) {
-    const message = await this.messageRepo.findOne({ where: { id: chatId } });
-    if (!message) {
-      throw new Error('Message not found');
-    }
-    message.read = true;
-    await this.messageRepo.save(message);
+ 
+
+  async readMessages(chatIds: string[]) {
+      // Find all messages with the given chat IDs using the In operator
+      const messages = await this.messageRepo.findBy({ id: In(chatIds) });
+  
+      if (messages.length !== chatIds.length) {
+          throw new Error('One or more messages not found');
+      }
+  
+      // Mark all found messages as read
+      messages.forEach(message => {
+          message.read = true;
+      });
+  
+      // Save all updated messages in bulk
+      await this.messageRepo.save(messages);
   }
+  
 }
+
 
 export default new ChatService();
