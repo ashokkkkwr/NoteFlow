@@ -28,10 +28,27 @@ export class friendController {
       }
 
 
+
       async viewFriendRequest(req:Request,res:Response){
         try{
           const receiverUserId=req.user?.id;
           const friendRequests =  await friendService.friendRequest(receiverUserId as string)
+          
+          res.status(StatusCodes.SUCCESS).json({
+            data: friendRequests,
+            status: true,
+            message: Message.fetched
+            
+          })
+ 
+        }catch(error){
+
+        }
+      }
+      async viewNotification(req:Request,res:Response){
+        try{
+          const receiverUserId=req.user?.id;
+          const friendRequests =  await friendService.viewNotification(receiverUserId as string)
           
           res.status(StatusCodes.SUCCESS).json({
             data: friendRequests,

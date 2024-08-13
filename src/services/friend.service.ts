@@ -5,12 +5,15 @@ import { Friends } from '../entities/friends.entity';
 import { Message } from '../constant/messages';
 import UserService from './user.service';
 import { Status } from '../constant/enum'
+import { FriendsNotification } from '../entities/friendsNotification.entity';
 import HttpException from '../utils/HttpException.utils';
 
 class FriendService {
   constructor(
     private readonly userRepo = AppDataSource.getRepository(User),
-    private readonly friendsRepo = AppDataSource.getRepository(Friends)
+    private readonly friendsRepo = AppDataSource.getRepository(Friends),
+    private readonly friendsNotificationRepo = AppDataSource.getRepository(FriendsNotification)
+
   ) { }
 
   async addFriend(senderUserId: any, receiverUserId: string, body: FriendDTO) {
@@ -41,6 +44,17 @@ class FriendService {
 
     return { message: Message.created };
   }
+  async addNotification(senderUserId: string, receiverUserId: string) {
+    if (senderUserId === receiverUserId) {
+      return { message: 'you cannot send a friend request to yourself' }
+    }
+    const addFriendNotification = new FriendsNotification()
+    addFriendNotification.sender_id = senderUserId
+    addFriendNotification.receiver_id = receiverUserId
+
+    await this.friendsNotificationRepo.save(addFriendNotification)
+    return { message: Message.created }
+  }
 
   async friendRequest(receiverUserId: string) {
     try {
@@ -54,6 +68,25 @@ class FriendService {
 
         .getMany()
       console.log(view)
+      return view
+    } catch (error) {
+      throw HttpException.notFound
+    }
+  }
+  async viewNotification(receiverUserId: string) {
+    try {
+      console.log('notification ma chai xa')
+      console.log(receiverUserId)
+      const view = await this.friendsNotificationRepo.createQueryBuilder('friendsNotification')
+        .leftJoinAndSelect('friendsNotification.sender', 'sender')
+        .leftJoinAndSelect('sender.details', 'details')
+        .leftJoinAndSelect('details.profileImage', 'profileImage')
+        .where('friendsNotification.receiver_id = :receiverUserId', { receiverUserId })
+        .orderBy('friendsNotification.createdAt', 'DESC')
+        .getMany();
+
+      console.log("ya to pugo...")
+      console.log(view, "notificaiton for the forntend")
       return view
     } catch (error) {
       throw HttpException.notFound
@@ -183,7 +216,7 @@ class FriendService {
         { sender_id: requestId }
       ]
     });
-    console.log(findRequest,'friend')
+    console.log(findRequest, 'friend')
     if (findRequest) {
       this.friendsRepo.delete(findRequest.id)
     } else {
