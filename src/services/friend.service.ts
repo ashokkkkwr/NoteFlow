@@ -16,7 +16,7 @@ class FriendService {
 
   ) { }
 
-  async addFriend(senderUserId: any, receiverUserId: string, body: FriendDTO) {
+  async addFriend(senderUserId: any, receiverUserId: string) {
     if (senderUserId === receiverUserId) {
       return { message: 'You cannot send a friend request to yourself.' };
     }
@@ -32,7 +32,6 @@ class FriendService {
     if (alreadySent) {
       return { message: 'Friend request already sent.' };
     }
-
     // Create a new friend request
     const addFriend = new Friends();
     addFriend.sender_id = senderUserId;
@@ -42,7 +41,7 @@ class FriendService {
     // Save the new friend request
     await this.friendsRepo.save(addFriend);
 
-    return { message: Message.created };
+    return addFriend;
   }
   async addNotification(senderUserId: string, receiverUserId: string) {
     if (senderUserId === receiverUserId) {
@@ -53,7 +52,7 @@ class FriendService {
     addFriendNotification.receiver_id = receiverUserId
 
     await this.friendsNotificationRepo.save(addFriendNotification)
-    return { message: Message.created }
+    return addFriendNotification
   }
 
   async friendRequest(receiverUserId: string) {
@@ -90,6 +89,25 @@ class FriendService {
       return view
     } catch (error) {
       throw HttpException.notFound
+    }
+  }
+  async markNotification(notificaitonId:string){
+    try{
+      const notification = await this.friendsNotificationRepo.findOne({
+        where:{
+          id:notificaitonId
+        }   
+      })
+      if(!notification){
+        throw HttpException.notFound
+      }
+      notification.read=true;
+      await this.friendsNotificationRepo.save(notification)
+
+      return notification
+    }catch(error){
+      console.log(error)
+      throw HttpException.internalServerError
     }
   }
   // async getFriends(userId: string): Promise<Auth[]> {
@@ -132,8 +150,6 @@ class FriendService {
           'receiver.details.profileImage',
         ],
       });
-
-
       const friends = view.map((friend) =>
         friend.sender.id === receiverUserId ? friend.receiver : friend.sender
       );

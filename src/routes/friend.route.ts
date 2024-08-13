@@ -14,6 +14,8 @@ router.post('/:id',catchAsync(FriendController.addFriend))
 router.get('/',catchAsync(FriendController.viewFriendRequest))
 router.get('/friends',catchAsync(FriendController.viewFriends))
 router.get('/notification',catchAsync(FriendController.viewNotification))
+router.patch('/read/:id',catchAsync(FriendController.markNotification))
+
 router.delete('/:id',catchAsync(FriendController.deleteRequest))
 router.delete('/unfriend/:id',catchAsync(FriendController.unfriend))
 
