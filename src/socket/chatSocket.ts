@@ -6,6 +6,7 @@ import { DotenvConfig } from '../config/env.config';
 import webTokenService from '../utils/webToken.service';
 import RoomService from '../services/room.service';
 import userService from '../services/user.service';
+import friendService from '../services/friend.service';
 
 export class ChatSocket {
   private userSockets = new Map();  // Map to track user ID to socket ID
@@ -54,7 +55,6 @@ export class ChatSocket {
       socket.on('joinRoom', async ({ receiverId }) => {
         const roomService = new RoomService();
         const room = await roomService.findOrCreateIfNotExist([userId, receiverId]);
-
         if (room) {
           // Leave any other room the user might have joined previously
           const currentRooms = Array.from(socket.rooms);
@@ -76,9 +76,13 @@ export class ChatSocket {
   
      // Handle friend request and emit event to specific user
      socket.on('request', async (receiverId: string) => {
+      const receiverDetails= await userService.getById(receiverId)
+      const senderDetails=await userService.getById(userId)
+      const notiService = await friendService.addNotification(userId,receiverId)
+      console.log(notiService,"yeah babyyyyyyyyyyyyyyy")
       const receiverSocketId = this.userSockets.get(receiverId);
       if (receiverSocketId) {
-        io.to(receiverSocketId).emit('notiReceiver', { receiverId });
+        io.to(receiverSocketId).emit('notiReceiver', { receiverId ,senderDetails});
         console.log(`Notification sent to user ${receiverId}`);
       } else {
         console.log('Receiver not connected');
@@ -93,12 +97,10 @@ export class ChatSocket {
           io.to(room.id).emit('typing', { userId });
         }
       });
-      // Handle sending message
       socket.on('sendMessage', async ({ receiverId, content }) => {
         const roomService = new RoomService();
         const room = await roomService.findOrCreateIfNotExist([userId, receiverId]);
         console.log(room,"room ho lalalalalalalalallalalalala")
-
         if (room) {
           try {
             const message = await chatService.sendMessage(userId, receiverId, content, room.id);
@@ -129,8 +131,7 @@ export class ChatSocket {
         } else {
           console.error('Room creation or retrieval failed');
         }
-      });
-
+      })
       socket.on('markMessagesAsRead', async ({ messageIds }) => {
         try {
           console.log(messageIds);

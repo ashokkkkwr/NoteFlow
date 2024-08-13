@@ -19,10 +19,8 @@ export class Friends extends Base {
   @ManyToOne(() => User, (user) => user.receivedFriendRequests)
   @JoinColumn({ name: 'receiver_id' })
   receiver: User;
-
   @Column()
   sender_id:string
-
   @Column()
   receiver_id:string
 }
