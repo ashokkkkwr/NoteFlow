@@ -52,20 +52,25 @@ export class UserAuthController {
   }
   async update(req: Request, res: Response) {
     if (req?.files?.length === 0) throw AppError.badRequest('Please select a file.')
-    const img = req?.files?.map((file: any) => {
+    const img = req?.files?.map((file?: any) => {
       return {
         name: file?.filename,
         mimiType: file?.mimetype,
         type: req.body?.type,
       }
     })
+    
     const bodyRole = req.body?.role
+    console.log("🚀 ~ UserAuthController ~ update ~ bodyRole:", bodyRole)
     const userId = req.params.id
-    if (bodyRole === Role.SUDO_ADMIN) throw HttpException.forbidden(Message.notAuthorized)
-    await userService.update(req.body as UserDTO, img, userId)
+    const body=req.body
+    console.log("🚀 ~ UserAuthController ~ update ~ body:", body)
+    const updated = await userService.update(body, img, userId)
+    console.log("🚀 ~ UserAuthController ~ update ~ req.body :", req.body )
     res.status(StatusCodes.CREATED).json({
       status: true,
       message: Message.created,
+      data:updated
     })
   }
   async getAll(req: Request, res: Response) {

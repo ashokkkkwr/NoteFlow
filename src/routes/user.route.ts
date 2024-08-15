@@ -2,9 +2,7 @@ import type { Router as IRouter } from 'express'
 import Router from 'express'
 import { UserAuthController } from '../controller/userAuth.controller'
 import { catchAsync } from '../utils/catchAsync.utils'
-import RequestValidator from '../middleware/Request.Validator'
 import upload from '../utils/fileUpload'
-import {UserDTO} from '../dto/user.dto'
 import { authentication } from '../middleware/authentication.middleware'
 const router: IRouter = Router()
 

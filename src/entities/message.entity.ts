@@ -29,6 +29,4 @@ export class Message extends Base {
   @JoinColumn({ name: 'room_id' })
   room: Room;
 
-
-
 }
