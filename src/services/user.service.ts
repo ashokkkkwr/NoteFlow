@@ -136,7 +136,6 @@ class UserService {
       userDetails.middle_name = data.middle_name
       userDetails.last_name = data.last_name
       userDetails.phone_number = data.phone_number
-
       const updatedUserDetails = await this.DetailsRepo.save(userDetails)
       await this.MediaRepo.delete({ UserMedia: updatedUserDetails })
       // Add new media entries
@@ -151,7 +150,7 @@ class UserService {
         const savedImage = await this.MediaRepo.save(image)
         savedImage.transferImageFromTempTOUploadFolder(updatedUserDetails.id, savedImage.type)
       }
-      return { success: true, message: 'Update successful' }
+      return updatedUserDetails
     } catch (error: any) {
       console.error('Error in update function:', error.message)
       return {

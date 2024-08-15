@@ -70,7 +70,6 @@ export class ChatSocket {
           console.error('Room creation or retrieval failed')
         }
       })
-
       // Handle friend request and emit event to specific user
       socket.on('request', async (receiverId: string) => {
         const sendFriendRequest = await friendService.addFriend(userId, receiverId)
@@ -103,7 +102,7 @@ export class ChatSocket {
       socket.on('sendMessage', async ({ receiverId, content }) => {
         const roomService = new RoomService()
         const room = await roomService.findOrCreateIfNotExist([userId, receiverId])
-        console.log(room, 'room ho lalalalalalalalallalalalala')
+       
         if (room) {
           try {
             const message = await chatService.sendMessage(userId, receiverId, content, room.id)
@@ -125,7 +124,6 @@ export class ChatSocket {
                 },
               },
             }
-
             io.to(room.id).emit('message', enrichedMessage)
             console.log(`Message sent from ${userId} to ${receiverId}`)
           } catch (error) {
