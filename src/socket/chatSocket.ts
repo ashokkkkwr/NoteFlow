@@ -137,15 +137,12 @@ export class ChatSocket {
         try {
           console.log(messageIds)
           const reads = await chatService.readMessages(messageIds)
-          console.log(reads, 'Messages marked as read')
-
           // Emit the messagesRead event to notify the client that these messages are marked as read
           io.to(socket.id).emit('messagesRead', { messageIds })
         } catch (error) {
           console.error('Error marking messages as read:', error)
         }
       })
-
       socket.on('accepted', async ({ id, senderId }) => {
         try {
           console.log(id, 'id ho la')
