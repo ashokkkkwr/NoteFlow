@@ -111,7 +111,8 @@ class UserService {
       }
     }
   }
-  async update(data: UserDTO, img: any[], userId: string) {
+  // async update(data: UserDTO, img: any[], userId: string) {
+    async update(data: UserDTO, userId: string) {
     try {
       const user = await this.UserRepo.findOne({
         where: { id: userId },
@@ -137,19 +138,19 @@ class UserService {
       userDetails.last_name = data.last_name
       userDetails.phone_number = data.phone_number
       const updatedUserDetails = await this.DetailsRepo.save(userDetails)
-      await this.MediaRepo.delete({ UserMedia: updatedUserDetails })
+      // await this.MediaRepo.delete({ UserMedia: updatedUserDetails })
       // Add new media entries
-      for (const j of img) {
-        const image = this.MediaRepo.create({
-          name: j.name,
-          mimetype: j.mimiType,
-          type: j.type,
-          UserMedia: updatedUserDetails,
-        })
-        console.log(image)
-        const savedImage = await this.MediaRepo.save(image)
-        savedImage.transferImageFromTempTOUploadFolder(updatedUserDetails.id, savedImage.type)
-      }
+      // for (const j of img) {
+      //   const image = this.MediaRepo.create({
+      //     name: j.name,
+      //     mimetype: j.mimiType,
+      //     type: j.type,
+      //     UserMedia: updatedUserDetails,
+      //   })
+      //   console.log(image)
+      //   const savedImage = await this.MediaRepo.save(image)
+      //   savedImage.transferImageFromTempTOUploadFolder(updatedUserDetails.id, savedImage.type)
+      // }
       return updatedUserDetails
     } catch (error: any) {
       console.error('Error in update function:', error.message)
