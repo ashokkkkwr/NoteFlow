@@ -51,21 +51,22 @@ export class UserAuthController {
     })
   }
   async update(req: Request, res: Response) {
-    if (req?.files?.length === 0) throw AppError.badRequest('Please select a file.')
-    const img = req?.files?.map((file?: any) => {
-      return {
-        name: file?.filename,
-        mimiType: file?.mimetype,
-        type: req.body?.type,
-      }
-    })
+    // if (req?.files?.length === 0) throw AppError.badRequest('Please select a file.')
+    // const img = req?.files?.map((file?: any) => {
+    //   return {
+    //     name: file?.filename,
+    //     mimiType: file?.mimetype,
+    //     type: req.body?.type,
+    //   }
+    // })
     
     const bodyRole = req.body?.role
     console.log("🚀 ~ UserAuthController ~ update ~ bodyRole:", bodyRole)
     const userId = req.params.id
     const body=req.body
     console.log("🚀 ~ UserAuthController ~ update ~ body:", body)
-    const updated = await userService.update(body, img, userId)
+    // const updated = await userService.update(body, img, userId)
+    const updated = await userService.update(body, userId)
     console.log("🚀 ~ UserAuthController ~ update ~ req.body :", req.body )
     res.status(StatusCodes.CREATED).json({
       status: true,
