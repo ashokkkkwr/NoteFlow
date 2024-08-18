@@ -5,7 +5,7 @@ import { User } from '../entities/user/user.entity'
 import { NotesDTO, UpdateNotesDTO } from '../dto/notes.dto'
 import { Message } from '../constant/messages'
 import NoteMedia from '../entities/note/notesMedia.entity'
-
+import transferImageFromUploadToTemp from '../entities/note/notesMedia.entity'
 class NotesService {
   constructor(
     private readonly notesRepo = AppDataSource.getRepository(Notes),
@@ -82,16 +82,27 @@ class NotesService {
 
     // return notes
   }
-  async update(userId: string, noteId: string, data: UpdateNotesDTO) {
+  async update(userId: string, noteId: string, data: UpdateNotesDTO, img:any[]) {
     // Checks if the note with the given noteId belongs to the user with the token userId
-    const note = await this.notesRepo.findOneBy({ id: noteId, user: { id: userId } })
-    if (!note) {
-      throw HttpException.notFound(Message.notFound)
+    try{
+      const post = await this.notesRepo.findOneBy({id:noteId})
+      if(!post) throw HttpException.notFound
+
+      post.title = data.title
+      post.content= data.content
+      const updatedPost = await this.notesRepo.save(post)
+      const media = await this.notesRepo.find({
+        where:{noteMedia:{
+          id:noteId
+        }},
+        relations:['posts']
+      })
+      if(media){
+        if(media.length>0){
+          transferImageFromUploadToTemp(notes.id,media.name)
+        }
+      }
     }
-    // The merge method merges the existing note object with the updated data provided.
-    this.notesRepo.merge(note, data)
-    await this.notesRepo.save(note)
-    return note
   }
 
   async delete(userId: string, noteId: string) {

@@ -79,9 +79,16 @@ export class NotesController {
         message: Message.notAuthorized,
       })
     }
+    const data= req?.files?.map((file?:any)=>{
+      return {
+        name:file?.filename,
+        mimetype:file?.mimetype,
+        type:req.body?.type
+      }
+    })
     const updateNotesDTO: UpdateNotesDTO = req.body
     try {
-      const updatedNote = await notesService.update(userId, noteId, updateNotesDTO)
+      const updatedNote = await notesService.update(userId, noteId, updateNotesDTO,data)
       res.status(StatusCodes.SUCCESS).json({
         status: true,
         message: Message.updated,
