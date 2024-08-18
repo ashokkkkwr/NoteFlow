@@ -5,7 +5,8 @@ import { User } from '../entities/user/user.entity'
 import { NotesDTO, UpdateNotesDTO } from '../dto/notes.dto'
 import { Message } from '../constant/messages'
 import NoteMedia from '../entities/note/notesMedia.entity'
-import transferImageFromUploadToTemp from '../entities/note/notesMedia.entity'
+// import transferImageFromUploadToTemp from '../entities/note/notesMedia.entity'
+import transferImageFromUploadToTemp from '../utils/path.utils'
 class NotesService {
   constructor(
     private readonly notesRepo = AppDataSource.getRepository(Notes),
