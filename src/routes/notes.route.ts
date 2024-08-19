@@ -19,7 +19,7 @@ router.use(authorization([Role.USER]))
 router.post('/',  upload.array('files'),catchAsync(notesController.create))
 
 router.get('/', catchAsync(notesController.getOne))
-router.patch('/:id', RequestValidator.validate(UpdateNotesDTO), catchAsync(notesController.update))
+router.patch('/:id', catchAsync(notesController.update))
 router.delete('/:id',catchAsync(notesController.delete))
 
 export default router
