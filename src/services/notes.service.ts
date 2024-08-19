@@ -1,48 +1,46 @@
 import { AppDataSource } from '../config/database.config'
 import HttpException from '../utils/HttpException.utils'
-import {Notes} from '../entities/note/notes.entity'
+import { Notes } from '../entities/note/notes.entity'
 import { User } from '../entities/user/user.entity'
 import { NotesDTO, UpdateNotesDTO } from '../dto/notes.dto'
 import { Message } from '../constant/messages'
 import NoteMedia from '../entities/note/notesMedia.entity'
 // import transferImageFromUploadToTemp from '../entities/note/notesMedia.entity'
-import transferImageFromUploadToTemp from '../utils/path.utils'
+import { transferImageFromUploadToTemp } from '../utils/path.utils'
+
 class NotesService {
   constructor(
     private readonly notesRepo = AppDataSource.getRepository(Notes),
     private readonly userRepo = AppDataSource.getRepository(User),
-    private  readonly imageRepo = AppDataSource.getRepository(NoteMedia)
+    private readonly imageRepo = AppDataSource.getRepository(NoteMedia)
   ) {}
-  async create(userId: any, data: NotesDTO,img :any[]) {
-    console.log(userId,"user ID")
-    console.log("image object")
- 
-    const auth = await this.userRepo.findBy({id:userId})
+  async create(userId: any, data: NotesDTO, img: any[]) {
+    console.log(userId, 'user ID')
+    console.log('image object')
+
+    const auth = await this.userRepo.findBy({ id: userId })
     console.log(auth)
-    if(!auth) throw HttpException.notFound
-    
+    if (!auth) throw HttpException.notFound
+
     const note = this.notesRepo.create({
       title: data.title,
       content: data.content,
       user: userId,
     })
- 
-   const pk= await this.notesRepo.save(note)
-    for(const j of img){
+
+    const pk = await this.notesRepo.save(note)
+    for (const j of img) {
       const image = this.imageRepo.create({
-        name:j.name,
-        mimetype:j.mimiType,
-        type:j.type,
-        note:pk
-
-      }) 
+        name: j.name,
+        mimetype: j.mimiType,
+        type: j.type,
+        note: pk,
+      })
       console.log(j)
-      const img=await this.imageRepo.save(image) 
+      const img = await this.imageRepo.save(image)
 
-      img.transferImageFromTempTOUploadFolder(note.id,img.type)
+      img.transferImageFromTempTOUploadFolder(note.id, img.type)
     }
-
-  
 
     return note
   }
@@ -69,43 +67,70 @@ class NotesService {
   //   }
   // }
   async getAll() {
-    try{
-      return await this.notesRepo.createQueryBuilder('notes')
-      .leftJoinAndSelect('notes.noteMedia','noteMedia')
-      .leftJoinAndSelect('notes.user','user')
-      .leftJoinAndSelect('user.details','details')
-      .leftJoinAndSelect('details.profileImage','profileImage')
-      .getMany()
-    }catch(error:any){
+    try {
+      return await this.notesRepo
+        .createQueryBuilder('notes')
+        .leftJoinAndSelect('notes.noteMedia', 'noteMedia')
+        .leftJoinAndSelect('notes.user', 'user')
+        .leftJoinAndSelect('user.details', 'details')
+        .leftJoinAndSelect('details.profileImage', 'profileImage')
+        .getMany()
+    } catch (error: any) {
       throw HttpException.badRequest(error.message)
     }
     // const notes = await this.notesRepo.find({  relations: ['user'] })
 
     // return notes
   }
-  async update(userId: string, noteId: string, data: UpdateNotesDTO, img:any[]) {
+  async update(userId: string, noteId: string, data: UpdateNotesDTO, img: any[]) {
     // Checks if the note with the given noteId belongs to the user with the token userId
-    try{
-      const post = await this.notesRepo.findOneBy({id:noteId})
-      if(!post) throw HttpException.notFound
+    try {
+      console.log("hhaa")
+      const notes = await this.notesRepo.findOneBy({ id: noteId })
+      console.log('🚀 ~ NotesService ~ update ~ notes:', notes)
+      if (!notes) throw HttpException.notFound
 
-      post.title = data.title
-      post.content= data.content
-      const updatedPost = await this.notesRepo.save(post)
-      const media = await this.notesRepo.find({
-        where:{noteMedia:{
-          id:noteId
-        }},
-        relations:['posts']
+      notes.title = data.title
+      notes.content = data.content
+      const updatedNote = await this.notesRepo.save(notes)
+      console.log('🚀 ~ NotesService ~ update ~ updatedNote:', updatedNote)
+      const media = await this.imageRepo.find({
+        where: {
+          note: {
+            id: noteId,
+          },
+        },
+        relations: ['note'],
       })
-      if(media){
-        if(media.length>0){
-          transferImageFromUploadToTemp(notes.id,media.name)
+      console.log("🚀 ~ NotesService ~ update ~ media:", media)
+      
+      if (media.length > 0) {
+        console.log("🚀 ~ NotesService ~ update ~ media:", media)
+        
+        for (const mediaItem of media) {
+          transferImageFromUploadToTemp(notes.id, mediaItem.name, mediaItem.type)
         }
+        await this.imageRepo
+          .createQueryBuilder()
+          .delete()
+          .from(NoteMedia)
+          .where('notes.id = :noteId', { noteId })
+          .execute()
       }
+      for (const file of img) {
+        const saveMedia = new NoteMedia()
+        saveMedia.name = file.name
+        saveMedia.mimetype = file.mimetype
+        saveMedia.type = file.type
+        saveMedia.note = updatedNote
+        const savedImage = await this.notesRepo.save(saveMedia)
+        savedImage.transferImageFromTempTOUploadFolder(notes.id, savedImage.type)
+      }
+      return Message.updated
+    } catch (error) {
+      console.log('🚀 ~ NotesService ~ update ~ error:', error)
     }
   }
-
   async delete(userId: string, noteId: string) {
     /**
 SELECT n.*

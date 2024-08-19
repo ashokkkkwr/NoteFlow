@@ -71,6 +71,7 @@ export class NotesController {
     })
   }
   async update(req: Request, res: Response) {
+    console.log("haha")
     const userId = req.user?.id
     const noteId = req.params.id
     if (!userId) {
