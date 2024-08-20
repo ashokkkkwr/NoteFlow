@@ -7,12 +7,14 @@ import { Message } from '../constant/messages'
 import NoteMedia from '../entities/note/notesMedia.entity'
 // import transferImageFromUploadToTemp from '../entities/note/notesMedia.entity'
 import { transferImageFromUploadToTemp } from '../utils/path.utils'
-
+import Comment from '../entities/comment.entity'
 class NotesService {
   constructor(
     private readonly notesRepo = AppDataSource.getRepository(Notes),
     private readonly userRepo = AppDataSource.getRepository(User),
-    private readonly imageRepo = AppDataSource.getRepository(NoteMedia)
+    private readonly imageRepo = AppDataSource.getRepository(NoteMedia),
+    private readonly commentRepo = AppDataSource.getRepository(Comment)
+
   ) {}
   async create(userId: any, data: NotesDTO, img: any[]) {
     console.log(userId, 'user ID')
@@ -143,11 +145,15 @@ WHERE n.id = $1 AND u.id = $2;
       id: noteId,
       user: { id: userId },
     })
-    
+
     if (!note) {
       throw HttpException.notFound(Message.notFound)
     }
     this.notesRepo.delete(note.id)
+    await this.commentRepo.delete({ note: { id: noteId } });
+
+    // Delete the note
+    await this.notesRepo.delete(note.id);
     return note
   }
 }

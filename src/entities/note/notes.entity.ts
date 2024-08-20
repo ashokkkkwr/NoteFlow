@@ -15,9 +15,9 @@ export class Notes extends Base {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @OneToMany(() => Comment, (comment) => comment.note)
+  @OneToMany(() => Comment, (comment) => comment.note,{cascade:true})
   comments: Comment[];
 
-  @OneToMany(() => NoteMedia, (noteMedia) => noteMedia.note)
+  @OneToMany(() => NoteMedia, (noteMedia) => noteMedia.note, { cascade: true, onDelete: 'CASCADE' })
   noteMedia: NoteMedia[];
 }
