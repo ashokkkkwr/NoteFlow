@@ -143,6 +143,7 @@ WHERE n.id = $1 AND u.id = $2;
       id: noteId,
       user: { id: userId },
     })
+    
     if (!note) {
       throw HttpException.notFound(Message.notFound)
     }
