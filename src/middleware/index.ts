@@ -41,9 +41,9 @@ const middleware = (app: Application) => {
   app.use(express.urlencoded({extended:false}))
   app.use('/api', routes)
   
-  // app.use(express.static(path.join(__dirname, '../', '../', 'public/uploads')))
-
   app.use(express.static(path.join(__dirname, '../', '../', 'public/uploads')))
+
+  app.use(express.static(path.join(__dirname, '../', '../', 'public')))
 
   app.set('view engine', 'ejs')
   app.set('views', path.join(__dirname, '../', 'views'))
