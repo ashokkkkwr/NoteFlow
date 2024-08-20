@@ -18,7 +18,7 @@ class NoteMedia extends Base {
   @Column({ enum: MediaType, type: 'enum' })
   type: MediaType.POST;
 
-  @ManyToOne(() => Notes, (notes) => notes.noteMedia)
+  @ManyToOne(() => Notes, (notes) => notes.noteMedia,{onDelete:'CASCADE'})
   @JoinColumn({ name: 'note_id' })
   note: Notes;
 

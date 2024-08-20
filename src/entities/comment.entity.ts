@@ -6,7 +6,7 @@ class Comment extends Base {
   @Column()
   comment: string;
 
-  @ManyToOne(() => Notes, (note) => note.comments)
+  @ManyToOne(() => Notes, (note) => note.comments,{onDelete:'CASCADE'})
   @JoinColumn({ name: 'post_id' })
   note: Notes;
 
