@@ -74,12 +74,13 @@ export class NotesController {
     console.log("haha")
     const userId = req.user?.id
     const noteId = req.params.id
-    if (!userId) {
-      return res.status(StatusCodes.UNAUTHORIZED).json({
-        status: false,
-        message: Message.notAuthorized,
-      })
-    }
+    // if (!userId) {
+    //   return res.status(StatusCodes.UNAUTHORIZED).json({
+    //     status: false,
+    //     message: Message.notAuthorized,
+    //   })
+    // }
+
     const data= req?.files?.map((file?:any)=>{
       return {
         name:file?.filename,
@@ -87,10 +88,11 @@ export class NotesController {
         type:req.body?.type
       }
     })
-    const updateNotesDTO: UpdateNotesDTO = req.body
     try {
-      const updatedNote = await notesService.update(userId, noteId, updateNotesDTO,data)
-      res.status(StatusCodes.SUCCESS).json({
+     const body = req.body
+      console.log(body,"body ho la")
+      const updatedNote = await notesService.update(userId!, noteId, req.body as NotesDTO,data)
+            res.status(StatusCodes.SUCCESS).json({
         status: true,
         message: Message.updated,
         data: updatedNote,

@@ -82,14 +82,13 @@ class NotesService {
 
     // return notes
   }
-  async update(userId: string, noteId: string, data: UpdateNotesDTO, img: any[]) {
-    // Checks if the note with the given noteId belongs to the user with the token userId
+  async update(userId: string, noteId: string, data: NotesDTO, img: any[]) {
     try {
       console.log("hhaa")
       const notes = await this.notesRepo.findOneBy({ id: noteId })
       console.log('🚀 ~ NotesService ~ update ~ notes:', notes)
       if (!notes) throw HttpException.notFound
-
+      console.log(data,"data")
       notes.title = data.title
       notes.content = data.content
       const updatedNote = await this.notesRepo.save(notes)
@@ -102,30 +101,32 @@ class NotesService {
         },
         relations: ['note'],
       })
+      console.log(noteId)
       console.log("🚀 ~ NotesService ~ update ~ media:", media)
-      
-      if (media.length > 0) {
-        console.log("🚀 ~ NotesService ~ update ~ media:", media)
-        
-        for (const mediaItem of media) {
-          transferImageFromUploadToTemp(notes.id, mediaItem.name, mediaItem.type)
+      if(media){
+        if (media.length > 0) {
+
+          for (const mediaItem of media) {
+            transferImageFromUploadToTemp(mediaItem.id, mediaItem.name, mediaItem.type)
+          }
+          await this.imageRepo
+            .createQueryBuilder()
+            .delete()
+            .from(NoteMedia)
+            .where('note.id = :noteId', { noteId })
+            .execute()
         }
-        await this.imageRepo
-          .createQueryBuilder()
-          .delete()
-          .from(NoteMedia)
-          .where('notes.id = :noteId', { noteId })
-          .execute()
+        for (const file of img) {
+          const saveMedia = new NoteMedia()
+          saveMedia.name = file.name
+          saveMedia.mimetype = file.mimetype
+          saveMedia.type = file.type
+          saveMedia.note = updatedNote
+          const savedImage = await this.imageRepo.save(saveMedia)
+          savedImage.transferImageFromTempTOUploadFolder(notes.id, savedImage.type)
+        }
       }
-      for (const file of img) {
-        const saveMedia = new NoteMedia()
-        saveMedia.name = file.name
-        saveMedia.mimetype = file.mimetype
-        saveMedia.type = file.type
-        saveMedia.note = updatedNote
-        const savedImage = await this.notesRepo.save(saveMedia)
-        savedImage.transferImageFromTempTOUploadFolder(notes.id, savedImage.type)
-      }
+     
       return Message.updated
     } catch (error) {
       console.log('🚀 ~ NotesService ~ update ~ error:', error)
