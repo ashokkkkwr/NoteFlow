@@ -2,6 +2,7 @@ import { UserDetails } from './details.entity';
 import { Column, Entity, JoinColumn, ManyToMany, OneToMany, OneToOne } from 'typeorm';
 import Base from '../base.entity';
 import { Notes } from '../note/notes.entity';
+import Comment from '../comment.entity'
 import { Role } from '../../constant/enum';
 import { Friends } from '../../entities/friends.entity';
 import { Message } from '../message.entity';
@@ -20,6 +21,8 @@ export class User extends Base {
 
   @OneToMany(() => Notes, (note) => note.user)
   notes: Notes[];
+  @OneToMany(() => Comment, (comment) => comment.user)
+  comments: Comment[];
 
   @Column({
     type: 'enum',
