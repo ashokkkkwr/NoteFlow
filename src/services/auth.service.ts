@@ -6,6 +6,7 @@ import BcryptService from '../utils/bcryptService'
 import userService from './user.service'
 import { jwtDecode } from 'jwt-decode'
 import { UserDetails } from '../entities/user/details.entity'
+import { UserDTO } from '../dto/user.dto'
 class AuthService {
   constructor(
     private readonly userRepo = AppDataSource.getRepository(User),
@@ -76,6 +77,43 @@ class AuthService {
       throw HttpException.badRequest(Message.error)
     }
   }
+  async updatePassword(userId: string, body: any) {
+    console.log("🚀 ~ AuthService ~ updatePassword ~ userId:", userId);
+    
+    try {
+      // Find the user by ID
+      const user = await this.userRepo.findOne({
+        where: { id: userId }
+      });
+      console.log("🚀 ~ AuthService ~ updatePassword ~ user:", user);
+      
+      if (!user) {
+        throw HttpException.notFound(`User not found`);
+      }
+      
+      // Compare the provided password with the existing hashed password
+      const isPasswordMatch = await this.bcryptService.compare(body.password, user.password);
+      
+      if (!isPasswordMatch) {
+        throw HttpException.badRequest(`Please enter the correct password`);
+      }
+  
+      // Hash the new password
+      const hashedPassword = await this.bcryptService.hash(body.updatedPassword);
+  
+      // Update the user's password with the new hashed password
+      user.password = hashedPassword;
+      
+      // Save the updated user record to the database
+      const save = await this.userRepo.save(user);
+      return save;
+  
+    } catch (error) {
+      console.error("🚀 ~ AuthService ~ updatePassword ~ error:", error);
+      throw HttpException.badRequest(`Error updating password`);
+    }
+  }
+  
 }
 
 
