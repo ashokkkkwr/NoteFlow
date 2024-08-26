@@ -206,14 +206,12 @@ export class UserAuthController {
     try {
       const user = await authService.verifyEmail(req.body.email)
       console.log("🚀 ~ UserAuthController ~ verifyEmail ~ user:", user)
-      const otp =  OtpService.generateOtp
+      const otp =  await OtpService.generateOtp()
       console.log("🚀 ~ UserAuthController ~ verifyEmail ~ otp:", otp)
       // valid for 5 minute
       const expires = Date.now() + 60000 * 5
-
       const payload = `${req?.body?.email}.${otp}.${expires}`
       console.log("🚀 ~ UserAuthController ~ verifyEmail ~ payload:", payload)
-
       const hash = HashService.hashOtp(payload)
       console.log("🚀 ~ UserAuthController ~ verifyEmail ~ hash:", hash)
       const token = `${hash}.${expires}`
