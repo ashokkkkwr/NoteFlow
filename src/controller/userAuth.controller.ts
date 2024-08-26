@@ -232,9 +232,19 @@ export class UserAuthController {
       throw HttpException.badRequest(error.message)
     }
   }
-
-
-
-
+  async verifyOtp(req:Request,res:Response){
+    try{
+      const user = await authService.verifyEmail(req.body.email)
+      const [hashedOtp,expires]=user.token.split('.')
+      // + sign le string lai integer ma convert garxa
+      if(Date.now()>+expires)throw HttpException.badRequest(Message.otpExpired)
+      const payload = `${req.body.email}.${req.body.otp}.${expires}`
+    const data = OtpService.verifyOtp(hashedOtp,payload)
+       console.log("🚀 ~ UserAuthController ~ verifyOtp ~ data:", data)
+       res.send('hii')
+    }catch(error){
+      throw HttpException.badRequest(`Internal Error`)
+    }
+  }
 }
 

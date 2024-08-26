@@ -10,4 +10,5 @@ export const Message = {
   updated:'successfully updated',
   deleted:'Successfully deleted',
   emailSent:'successfully email sent',
+  otpExpired:'Opt has been expired'
 }

@@ -10,6 +10,7 @@ const userAuthController = new UserAuthController()
 
 const router = express.Router()
 router.post('/verify-email', catchAsync(userAuthController.verifyEmail))
+router.post('/verify-otp', catchAsync(userAuthController.verifyOtp))
 router.post('/',catchAsync(userAuthController.login))
 router.use(authentication())
 router.patch('/',catchAsync(userAuthController.updatePassword))
