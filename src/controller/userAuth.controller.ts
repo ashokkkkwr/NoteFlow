@@ -7,12 +7,11 @@ import { UserDTO } from '../dto/user.dto'
 import webTokenService from '../utils/webToken.service'
 import { Role } from '../constant/enum'
 import HttpException from '../utils/HttpException.utils'
-import { OtpService } from '../services/utils/otp.services'
-import { HashService } from '../services/utils/hash.service'
+import  OtpService  from '../services/utils/otp.services'
+import  HashService  from '../services/utils/hash.service'
 import AppError from '../utils/HttpException.utils'
 export class UserAuthController {
-  constructor(private readonly hashService = new HashService(),
-    private readonly otpService = new OtpService()) { }
+
   async create(req: Request, res: Response) {
     if (req?.files?.length === 0) throw AppError.badRequest('Please select a file.')
     console.log(req?.files, "iamge details")
@@ -206,19 +205,24 @@ export class UserAuthController {
   async verifyEmail(req: Request, res: Response) {
     try {
       const user = await authService.verifyEmail(req.body.email)
-      const otp = await this.otpService.generateOtp()
+      console.log("🚀 ~ UserAuthController ~ verifyEmail ~ user:", user)
+      const otp =  await OtpService.generateOtp()
+      console.log("🚀 ~ UserAuthController ~ verifyEmail ~ otp:", otp)
       // valid for 5 minute
       const expires = Date.now() + 60000 * 5
-
       const payload = `${req?.body?.email}.${otp}.${expires}`
-      const hash = this.hashService.hashOtp(payload)
+      console.log("🚀 ~ UserAuthController ~ verifyEmail ~ payload:", payload)
+      const hash = HashService.hashOtp(payload)
+      console.log("🚀 ~ UserAuthController ~ verifyEmail ~ hash:", hash)
       const token = `${hash}.${expires}`
 
+      console.log("🚀 ~ UserAuthController ~ verifyEmail ~ token:", token)
       await authService.setToken(user.id, token)
-      await this.otpService.sendPasswordResetOtpMail({
+     const reset= await OtpService.sendPasswordResetOtpMail({
         email: req.body.email,
         otp: `${otp}`,
       })
+     console.log("🚀 ~ UserAuthController ~ verifyEmail ~ reset:", reset)
 
       res.status(StatusCodes.SUCCESS).json({
         status: true,
