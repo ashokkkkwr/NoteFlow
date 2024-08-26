@@ -36,7 +36,6 @@ class AuthService {
   }
   async verifyEmail(email:string){
     const user = await this.userRepo.findOne({where:{email}})
- 
     if(!user) throw HttpException.notFound(Message.notFound)
       return user 
   }

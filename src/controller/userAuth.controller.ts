@@ -203,6 +203,31 @@ export class UserAuthController {
       })
     }
   }
+  async verifyEmail(req: Request, res: Response) {
+    try {
+      const user = await authService.verifyEmail(req.body.email)
+      const otp = await this.otpService.generateOtp()
+      // valid for 5 minute
+      const expires = Date.now() + 60000 * 5
+
+      const payload = `${req?.body?.email}.${otp}.${expires}`
+      const hash = this.hashService.hashOtp(payload)
+      const token = `${hash}.${expires}`
+
+      await authService.setToken(user.id, token)
+      await this.otpService.sendPasswordResetOtpMail({
+        email: req.body.email,
+        otp: `${otp}`,
+      })
+
+      res.status(StatusCodes.SUCCESS).json({
+        status: true,
+        message: Message.emailSent,
+      })
+    } catch (error: any) {
+      throw HttpException.badRequest(error.message)
+    }
+  }
 
 
 
