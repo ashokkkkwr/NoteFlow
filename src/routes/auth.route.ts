@@ -12,6 +12,8 @@ const router = express.Router()
 router.post('/verify-email', catchAsync(userAuthController.verifyEmail))
 router.post('/verify-otp', catchAsync(userAuthController.verifyOtp))
 router.post('/',catchAsync(userAuthController.login))
+router.post('/google',catchAsync(userAuthController.googleLogin))
+router.post('/reset-password',catchAsync(userAuthController.resetPassword))
 router.use(authentication())
 router.patch('/',catchAsync(userAuthController.updatePassword))
 export default router

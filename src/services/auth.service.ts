@@ -44,30 +44,50 @@ class AuthService {
   }
   async googleLogin(googleId: string): Promise<any> {
     try {
+      console.log('haha')
       const decoded: any = jwtDecode(googleId);
+      console.log("🚀 ~ AuthService ~ googleLogin ~ decoded:", decoded)
       const user = await this.userRepo.findOne({
         where: {email: decoded.email},
         relations: ['details'],
       });
+      console.log("🚀 ~ AuthService ~ googleLogin ~ user:", user)
       if (!user) {
         try {
           const user = new User();
           user.email = decoded?.email;
+          console.log("🚀 ~ AuthService ~ googleLogin ~ decoded?.email;:", decoded?.email)
           user.password = await this.bcryptService.hash(decoded?.sub);
 
           const save = await this.userRepo.save(user);
+          console.log("🚀 ~ AuthService ~ googleLogin ~ save:", save)
+          
           if (save) {
             const details = new UserDetails();
             details.user = save;
+            console.log("🚀 ~ AuthService ~ googleLogin ~ save:", save)
             details.first_name = decoded.given_name;
+            console.log("🚀 ~ AuthService ~ googleLogin ~ decoded.given_name:", decoded.given_name)
             details.last_name = decoded.family_name;
-            details.gender = decoded.gender;
-            await this.detailsRepo.save(details);
-            return await userService.getById(save.id);
+            console.log("🚀 ~ AuthService ~ googleLogin ~ decoded.family_name:", decoded.family_name)
+            // details.gender = decoded.gender;
+            // console.log("🚀 ~ AuthService ~ googleLogin ~ decoded.gender:", decoded.gender)
+            try{
+              const x= await this.detailsRepo.save(details);
+            }catch(error){
+              console.log("🚀 ~ AuthService ~ googleLogin ~ error:", error)
+              
+            }
+           
+            // console.log("🚀 ~ AuthService ~ googleLogin ~ x:", x)
+            console.log("🚀 ~ AuthService ~ googleLogin ~ saved:", save)
+            return await userService.getById(save?.id);
           }
         } catch (error) {
           throw HttpException.badRequest(Message.error);
         }
+      }else{
+        return console.log('Already registered...')
       }
     } catch (error) {
       throw HttpException.badRequest(Message.error);
@@ -111,6 +131,23 @@ class AuthService {
   async setOptVerified(email:string,verify:boolean){
     await this.userRepo.update({email},{otpVerified:verify})
     return Message.updated
+  }
+  async resetPassword(data:any){
+    try{  
+      console.log(data.email)
+      const user= await this.userRepo.findOne({
+        where: {email:data.email,otpVerified: true}
+      })
+      console.log("🚀 ~ AuthService ~ resetPassword ~ user:", user)
+      if(!user)throw HttpException.notFound(Message.notFound)
+      const [expires]=user.token.split('.')
+      if(Date.now()>+expires) throw HttpException.badRequest(Message.otpExpired)
+      const hashedPassword = await this.bcryptService.hash(data.newPassword)
+      const update=this.userRepo.update({id:user.id},{password:hashedPassword,otpVerified:false,token:''})
+      return update
+    }catch(error:any){
+      throw HttpException.badRequest(error.message)
+    }
   }
 }
 
