@@ -165,18 +165,21 @@ export class UserAuthController {
   async googleLogin(req: Request, res: Response) {
     try {
       const googleId = req.body.googleId;
+      console.log("🚀 ~ UserAuthController ~ googleLogin ~ googleId:", googleId)
       const data = await authService.googleLogin(googleId);
+      console.log("🚀 ~ UserAuthController ~ googleLogin ~ data:", data)
       const tokens = webTokenService.generateTokens(
         {
           id: data.id,
         },
         data.role,
       );
+      console.log("🚀 ~ UserAuthController ~ googleLogin ~ tokens:", tokens)
       res.status(StatusCodes.SUCCESS).json({
         data: {
           user: {
-            id: data.id,
-            email: data.email,
+            id: data?.id,
+            email: data?.email,
             details: {
               firstName: data.details.first_name,
               lastName: data.details.last_name,
