@@ -13,8 +13,11 @@ import HashService from './hash.service';
     console.log('otp');
     return crypto.randomInt(10000, 99999);
   }
-  verifyOtp(hashedOtp: string, data: any) {
+  async verifyOtp(hashedOtp: string, data: any) {
     const computedHash = HashService.hashOtp(data);
+    const isMatch = computedHash === hashedOtp;
+    console.log(computedHash,"haha")
+    return isMatch
   }
   async sendPasswordResetOtpMail(data: any) {
     await this.mailService.sendMail({
