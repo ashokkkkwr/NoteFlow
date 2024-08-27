@@ -112,6 +112,23 @@ class AuthService {
     await this.userRepo.update({email},{otpVerified:verify})
     return Message.updated
   }
+  async resetPassword(data:any){
+    try{  
+      console.log(data.email)
+      const user= await this.userRepo.findOne({
+        where: {email:data.email,otpVerified: true}
+      })
+      console.log("🚀 ~ AuthService ~ resetPassword ~ user:", user)
+      if(!user)throw HttpException.notFound(Message.notFound)
+      const [expires]=user.token.split('.')
+      if(Date.now()>+expires) throw HttpException.badRequest(Message.otpExpired)
+      const hashedPassword = await this.bcryptService.hash(data.newPassword)
+      const update=this.userRepo.update({id:user.id},{password:hashedPassword,otpVerified:false,token:''})
+      return update
+    }catch(error:any){
+      throw HttpException.badRequest(error.message)
+    }
+  }
 }
 
 export default new AuthService();

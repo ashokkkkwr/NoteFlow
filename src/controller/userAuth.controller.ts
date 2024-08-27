@@ -242,11 +242,17 @@ export class UserAuthController {
       const setTrue= await authService.setOptVerified(req.body.email,true)
       console.log('🚀 ~ UserAuthController ~ verifyOtp ~ data:', data);
       res.status(StatusCodes.SUCCESS).json({
+        data:setTrue,
         status: true,
         message: Message.validOtp,
       })
     } catch (error) {
       throw HttpException.badRequest(`Internal Error`);
     }
+  }
+  async resetPassword(req:Request,res:Response){
+    console.log(req.body)
+    const data = await authService.resetPassword(req.body)
+    console.log("🚀 ~ UserAuthController ~ resetPassword ~ data:", data)
   }
 }
