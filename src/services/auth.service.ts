@@ -87,7 +87,7 @@ class AuthService {
           throw HttpException.badRequest(Message.error);
         }
       }else{
-        return console.log('Already registered...')
+        return await userService.getById(user.id)
       }
     } catch (error) {
       throw HttpException.badRequest(Message.error);
