@@ -5,20 +5,7 @@ import {Message} from '../constant/messages'
 import commentService from "../services/comment.service";
 import { CommentDTO } from "../dto/comment.dto";
 export class CommentController {
-    // try {
-    //     const data=await notesService.create(userId, notesDTO)
-    //     console.log(data,'dataa')
-    //     res.status(StatusCodes.CREATED).json({
-    //       status: true,
-    //       message: Message.created,
-    //       data,
-    //     })
-    //   } catch (error: any) {
-    //     res.status(error.status || StatusCodes.INTERNAL_SERVER_ERROR).json({
-    //       status: false,
-    //       message: error.message,
-    //     })
-    //   }
+ 
     async addComment(req:Request,res:Response)
     {
         try{
@@ -45,7 +32,6 @@ export class CommentController {
         try{
              
             const commentId= req.params.id
-            console.log(commentId,"comment id")
             const data = await commentService.update(commentId as string,req.body as CommentDTO)
             res.status(StatusCodes.CREATED).json({
                 status:true,
