@@ -45,5 +45,20 @@ export class ChatController {
       });
     }
   }
+  async getUnreadCounts(req:Request,res:Response){
+    const userId = req.user?.id;
+    const receiverId=req.params.id;
+    try{
+      const readCounts = await chatService.getUnreadCounts(userId as string,receiverId)
+      console.log("🚀 ~ ChatController ~ getUnreadCounts ~ readCounts:", readCounts)
+      res.status(StatusCodes.SUCCESS).json({
+        status:true,
+        data:readCounts
+      })
+    }catch(error){
+    console.log("🚀 ~ ChatController ~ getUnreadCounts ~ error:", error)
+
+    }
+  }
 
 }

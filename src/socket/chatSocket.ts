@@ -54,6 +54,7 @@ export class ChatSocket {
       socket.on('joinRoom', async ({ receiverId }) => {
         const roomService = new RoomService()
         const room = await roomService.findOrCreateIfNotExist([userId, receiverId])
+        console.log("🚀 ~ ChatSocket ~ socket.on ~ room:", room)
         if (room) {
           // Leave any other room the user might have joined previously
           const currentRooms = Array.from(socket.rooms)
@@ -64,6 +65,7 @@ export class ChatSocket {
             }
           })
           socket.join(room.id)
+          
         } else {
           console.error('Room creation or retrieval failed')
         }
