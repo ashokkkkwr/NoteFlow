@@ -59,7 +59,6 @@ class ChatService {
       const decryptedChats = chats.map(chat => {
         try {
           const decryptedMessage = EncryptionService.decryptMessage(chat.content);
-          console.log("Decrypted message:", decryptedMessage);
           return { ...chat, content: decryptedMessage };
         } catch (error) {
           console.error(`Failed to decrypt message with ID ${chat.id}:`, error);
@@ -74,12 +73,23 @@ class ChatService {
     }
   }
 
+  // async readMessages(receiverId:string,senderId:string){
+  //   const messages = await this.messageRepo.update({
+  //     sender:{id:senderId},
+  //     receiver:{id:receiverId},
+  //     read:false
+  //   },
+  //  {read:true} 
+  // )
+  // return messages
+  // }
+
   async readMessages(receiverId:string,senderId:string) {
     const messages = await this.messageRepo.findBy({sender_id:senderId,receiver_id:receiverId  });
     messages.forEach(message => {
       message.read = true;
     });
-    const result = await this.messageRepo.save(messages);
+    return await this.messageRepo.save(messages);
   }
   async getUnreadCounts(senderId: string, receiverId: string) {
     const unreadCount = await this.messageRepo.count({
@@ -89,7 +99,6 @@ class ChatService {
         read: false,
       }
     });
-    
     return unreadCount;
   }
 
