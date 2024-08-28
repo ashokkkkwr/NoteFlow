@@ -129,8 +129,7 @@ export class ChatSocket {
               //   unreadCount:unreadCount
               // })
             } catch (error) {
-              console.log("🚀 ~ ChatSocket ~ socket.on ~ error:", error)
-              
+              console.log("🚀 ~ ChatSocket ~ socket.on ~ error:", error) 
             }
           } catch (error) {
             console.error('Error sending message:', error);
