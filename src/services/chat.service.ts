@@ -75,26 +75,26 @@ class ChatService {
     }
   }
 
-  async readMessages(senderId:string,receiverId:string) {
+  async readMessages(receiverId:string,senderId:string) {
     const messages = await this.messageRepo.findBy({sender_id:senderId,receiver_id:receiverId  });
-    console.log("🚀 ~ ChatService ~ readMessages ~ messages:", messages)
-
-    
-
     messages.forEach(message => {
-      console.log("🚀 ~ ChatService ~ readMessages ~ message:", message)
-
       message.read = true;
     });
-    console.log("🚀 ~ ChatService ~ readMessages ~ messages:", messages)
-
     const result = await this.messageRepo.save(messages);
-    console.log("🚀 ~ ChatService ~ readMessages ~ result:", result)
   }
-  async getUnreadCounts(senderId:string,receiverId:string){
-    const messages= await this.messageRepo.findBy({sender_id:senderId,receiver_id:receiverId})
-    
+  async getUnreadCounts(senderId: string, receiverId: string) {
+    const unreadCount = await this.messageRepo.count({
+      where: {
+        sender_id: senderId,
+        receiver_id: receiverId,
+        read: false,
+      }
+    });
+    console.log("🚀 ~ ChatService ~ getUnreadCounts ~ unreadCount:", unreadCount)
+
+    return unreadCount;
   }
+
     
 }
 

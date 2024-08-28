@@ -7,6 +7,7 @@ import webTokenService from '../utils/webToken.service'
 import RoomService from '../services/room.service'
 import userService from '../services/user.service'
 import friendService from '../services/friend.service'
+import { get } from 'http'
 
 export class ChatSocket {
   private userSockets = new Map() // Map to track user ID to socket ID
@@ -39,15 +40,13 @@ export class ChatSocket {
     })
 
     io.on('connection', async (socket) => {
-      console.log(`User connected profileImage: receiverDetails.details.profileImage,
-: ${socket.id}`)
+    
       const userId = socket.data.user.id
       this.userSockets.set(userId, socket.id)
       // Mark user as active when they connect
       try {
         await userService.active(userId)
         io.emit('statusChange', { userId, active: true }) // Notify all clients about the user's active status
-        console.log(`User ${userId} marked as active`)
       } catch (error) {
         console.error('Error marking user as active:', error)
       }
@@ -65,7 +64,6 @@ export class ChatSocket {
             }
           })
           socket.join(room.id)
-          console.log(`User ${userId} joined room ${room.id}`)
         } else {
           console.error('Room creation or retrieval failed')
         }
@@ -76,12 +74,9 @@ export class ChatSocket {
         const receiverDetails = await userService.getById(receiverId)
         const senderDetails = await userService.getById(userId)
         const notiService = await friendService.addNotification(userId, receiverId)
-        console.log(notiService, 'yeah babyyyyyyyyyyyyyyy')
-        console.log(sendFriendRequest, 'hahahahahahahahahhaahah')
         const receiverSocketId = this.userSockets.get(receiverId)
         if (receiverSocketId) {
           io.to(receiverSocketId).emit('notiReceiver', { receiverId, senderDetails, notiService })
-          console.log(`Notification sent to user ${receiverId}`)
         } else {
           console.log('Receiver not connected')
         }
@@ -92,7 +87,6 @@ export class ChatSocket {
       })
       // Handle typing event
       socket.on('typing', async ({ receiverId }) => {
-        console.log('User is typing')
         const roomService = new RoomService()
         const room = await roomService.findOrCreateIfNotExist([userId, receiverId])
         if (room) {
@@ -135,7 +129,6 @@ export class ChatSocket {
       })
       socket.on('markMessagesAsRead', async ({ receiverId }) => {
         try {
-          console.log(receiverId)
           const reads = await chatService.readMessages(userId,receiverId)
           console.log("🚀 ~ ChatSocket ~ socket.on ~ reads:", reads)
           // Emit the messagesRead event to notify the client that these messages are marked as read
@@ -143,6 +136,9 @@ export class ChatSocket {
         } catch (error) {
           console.error('Error marking messages as read:', error)
         }
+      })
+      socket.on('unreadCounts',async({receiverId})=>{
+        const unreadMessageCount = await chatService.getUnreadCounts(userId,receiverId)
       })
       socket.on('accepted', async ({ id, senderId }) => {
         try {
