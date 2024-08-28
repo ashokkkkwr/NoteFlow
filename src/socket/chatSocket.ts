@@ -133,12 +133,13 @@ export class ChatSocket {
           console.error('Room creation or retrieval failed')
         }
       })
-      socket.on('markMessagesAsRead', async ({ messageIds }) => {
+      socket.on('markMessagesAsRead', async ({ receiverId }) => {
         try {
-          console.log(messageIds)
-          const reads = await chatService.readMessages(messageIds)
+          console.log(receiverId)
+          const reads = await chatService.readMessages(userId,receiverId)
+          console.log("🚀 ~ ChatSocket ~ socket.on ~ reads:", reads)
           // Emit the messagesRead event to notify the client that these messages are marked as read
-          io.to(socket.id).emit('messagesRead', { messageIds })
+          // io.to(socket.id).emit('messagesRead', { messageIds })
         } catch (error) {
           console.error('Error marking messages as read:', error)
         }
