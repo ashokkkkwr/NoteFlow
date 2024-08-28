@@ -75,19 +75,27 @@ class ChatService {
     }
   }
 
-  async readMessages(chatIds: string[]) {
-    const messages = await this.messageRepo.findBy({ id: In(chatIds) });
+  async readMessages(senderId:string,receiverId:string) {
+    const messages = await this.messageRepo.findBy({sender_id:senderId,receiver_id:receiverId  });
+    console.log("🚀 ~ ChatService ~ readMessages ~ messages:", messages)
 
-    if (messages.length !== chatIds.length) {
-      throw new Error('One or more messages not found');
-    }
+    
 
     messages.forEach(message => {
+      console.log("🚀 ~ ChatService ~ readMessages ~ message:", message)
+
       message.read = true;
     });
+    console.log("🚀 ~ ChatService ~ readMessages ~ messages:", messages)
 
-    await this.messageRepo.save(messages);
+    const result = await this.messageRepo.save(messages);
+    console.log("🚀 ~ ChatService ~ readMessages ~ result:", result)
   }
+  async getUnreadCounts(senderId:string,receiverId:string){
+    const messages= await this.messageRepo.findBy({sender_id:senderId,receiver_id:receiverId})
+    
+  }
+    
 }
 
 export default new ChatService();
