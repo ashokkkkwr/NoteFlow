@@ -35,7 +35,6 @@ class ChatService {
     message.room = room;
 
     const savedMessage = await this.messageRepo.save(message);
-    console.log(savedMessage, message, "Message saved successfully.");
 
     // Decrypt the message before returning
     const decryptedContent = EncryptionService.decryptMessage(savedMessage.content);
@@ -85,13 +84,12 @@ class ChatService {
   async getUnreadCounts(senderId: string, receiverId: string) {
     const unreadCount = await this.messageRepo.count({
       where: {
-        sender_id: senderId,
-        receiver_id: receiverId,
+        sender_id: receiverId,
+        receiver_id: senderId,
         read: false,
       }
     });
-    console.log("🚀 ~ ChatService ~ getUnreadCounts ~ unreadCount:", unreadCount)
-
+    
     return unreadCount;
   }
 
