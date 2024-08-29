@@ -6,6 +6,7 @@ import { UserDTO } from '../dto/user.dto'
 import HttpException from '../utils/HttpException.utils'
 import BcryptService from '../utils/bcryptService'
 import UserMedia from '../entities/user/userMedia.entity'
+import { transferImageFromUploadToTemp } from '../utils/path.utils'
 class UserService {
   constructor(
     private readonly UserRepo = AppDataSource.getRepository(User),
@@ -50,7 +51,9 @@ class UserService {
         })
         console.log(j.name, 'this is image detials')
         const img = await this.MediaRepo.save(image)
-        img.transferImageFromTempTOUploadFolder(details.id, img.type)
+        img.transferImageFromTempTOUploadFolder(userDetails.id, img.type)
+        console.log(userDetails.id)
+        console.log(details.id)
       }
 
       return Message.created
@@ -188,6 +191,57 @@ class UserService {
     if (!user) throw HttpException.notFound(Message.notFound)
     await this.UserRepo.remove(user)
     return { message: 'User deleted successfully' }
+  }
+  async updateProfile(img:any[],userId: string){
+    const user = await this.UserRepo.findOneBy({ id: userId })
+    console.log("🚀 ~ updateProfile ~ user:", user)
+    if (!user) throw HttpException.notFound
+
+    const userDetail = await this.DetailsRepo.findOneBy({user:{id:userId}})
+    const userDetailId = userDetail?.id
+    console.log("🚀 ~ updateProfile ~ userDetail:", userDetail)
+    if(!userDetail) throw HttpException.notFound
+
+    const media = await this.MediaRepo.find({
+      where: {
+        UserMedia:{
+          id:userDetail.id
+        }
+      },
+    })
+    console.log("🚀 ~ updateProfile ~ media:", media)
+    if(media){
+      if (media.length > 0) {
+
+        for (const mediaItem of media) {
+          transferImageFromUploadToTemp(mediaItem.id, mediaItem.name, mediaItem.type)
+        }
+        await this.MediaRepo
+          .createQueryBuilder()
+          .delete()
+          .from(UserMedia)
+          .where('UserMedia.id = :userDetailId', { userDetailId })
+          .execute()
+    }
+
+
+
+      for (const file of img) {
+        const image = this.MediaRepo.create({
+          name:file.name,
+          mimetype:file.name,
+          type:file.type,
+          UserMedia:userDetail
+        })
+
+        const savedImage = await this.MediaRepo.save(image)
+        console.log("🚀 ~ updateProfile ~ savedImage.type:", savedImage.type)
+
+        savedImage.transferImageFromTempTOUploadFolder(userDetail.id, savedImage.type)
+        // img.transferImageFromTempTOUploadFolder(userDetails.id, img.type)
+
+      }
+    }
   }
 }
 export default new UserService()

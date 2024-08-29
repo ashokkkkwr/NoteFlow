@@ -63,6 +63,26 @@ export class UserAuthController {
       data: updated,
     });
   }
+  async updateProfile(req:Request,res:Response){
+    const userId=req.user?.id
+    console.log(userId,"hihihihih")
+    console.log("🚀 ~ UserAuthController ~ updateProfile ~ userId:", userId)
+    const data= req?.files?.map((file?:any)=>{
+      return {
+        name:file?.filename,
+        mimetype:file?.mimetype,
+        type:req.body?.type
+      }
+      
+    })
+    try{
+      const updatedNote = await userService.updateProfile(data,userId as string)
+      res.send(updatedNote)
+
+    }catch(error){
+      
+    }
+  }
   async updatePassword(req: Request, res: Response) {
     try {
       const userId = req.user?.id;

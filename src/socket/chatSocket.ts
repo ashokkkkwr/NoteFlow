@@ -118,7 +118,19 @@ export class ChatSocket {
               },
             };
             io.to(room.id).emit('message', enrichedMessage);
-            console.log(`Message sent from ${userId} to ${receiverId}`);
+            try {
+              const unreadCount = await chatService.getUnreadCounts(receiverId,userId)
+              const receiverSocketId = this.userSockets.get(receiverId);
+              if (receiverSocketId) {
+                io.to(receiverSocketId).emit('unreadCounts', {receiverId:senderDetails.id, unreadCount:unreadCount});
+              }
+              // io.to(userId).emit('unreadCounts',{
+              //   receiverId:receiverId,
+              //   unreadCount:unreadCount
+              // })
+            } catch (error) {
+              console.log("🚀 ~ ChatSocket ~ socket.on ~ error:", error) 
+            }
           } catch (error) {
             console.error('Error sending message:', error);
           }

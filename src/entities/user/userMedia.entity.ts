@@ -15,24 +15,21 @@ class UserMedia extends Base {
   mimetype: string;
 
   @Column({enum: MediaType, type: 'enum'})
-  type: MediaType.POST;
-
+  type: MediaType.PROFILE;
   //   @ManyToOne(() => Notes, (notes) => notes.noteMedia)
   //   @JoinColumn({ name: 'note_id' })
   //   note: Notes;
   @ManyToOne(() => UserDetails, (details) => details.profileImage)
   @JoinColumn({name: 'user_id'})
   UserMedia: UserDetails;
-
   public path: string;
-
   transferImageFromTempTOUploadFolder(id: string, type: MediaType): void {
     const TEMP_FOLDER_PATH = path.join(getTempFolderPath(), this.name);
     const UPLOAD_FOLDER_PATH = path.join(
       getUploadFolderPath(),
       type.toLowerCase(),
       this.id.toString(),
-    );
+    )
     !fs.existsSync(UPLOAD_FOLDER_PATH) && fs.mkdirSync(UPLOAD_FOLDER_PATH, {recursive: true});
     fs.renameSync(TEMP_FOLDER_PATH, path.join(UPLOAD_FOLDER_PATH, this.name));
   }
