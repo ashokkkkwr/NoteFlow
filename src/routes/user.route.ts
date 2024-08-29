@@ -10,10 +10,14 @@ const userAuthController = new UserAuthController()
 // router.post('/new-signup',upload.array('files'),catchAsync(userAuthController.))
 
 router.post('/signup', upload.array('files'),catchAsync(userAuthController.create))
-router.patch('/:id',upload.array('files'),catchAsync(userAuthController.update))
+
+router.patch('/update/:id',upload.array('files'),catchAsync(userAuthController.update))
+
 router.get('/', catchAsync(userAuthController.getAll))
 router.get('/one/:id',userAuthController.getOne)
 router.use(authentication())
+router.patch('/update-media',upload.array('files'),catchAsync(userAuthController.updateProfile))
+
 router.get('/byToken',userAuthController.getByToken)
 router.delete('/:id',userAuthController.delete)
 export default router

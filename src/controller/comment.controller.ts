@@ -26,7 +26,6 @@ export class CommentController {
             })
         }
     }
-    
     async updateComment(req:Request,res:Response)
     {
         try{
