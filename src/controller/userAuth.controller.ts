@@ -63,25 +63,21 @@ export class UserAuthController {
       data: updated,
     });
   }
-  async updateProfile(req:Request,res:Response){
-    const userId=req.user?.id
-    console.log(userId,"hihihihih")
-    console.log("🚀 ~ UserAuthController ~ updateProfile ~ userId:", userId)
-    const data= req?.files?.map((file?:any)=>{
+  async updateProfile(req: Request, res: Response) {
+    const userId = req.user?.id;
+    console.log(userId, 'hihihihih');
+    console.log('🚀 ~ UserAuthController ~ updateProfile ~ userId:', userId);
+    const data = req?.files?.map((file?: any) => {
       return {
-        name:file?.filename,
-        mimetype:file?.mimetype,
-        type:req.body?.type
-      }
-      
-    })
-    try{
-      const updatedNote = await userService.updateProfile(data,userId as string)
-      res.send(updatedNote)
-
-    }catch(error){
-      
-    }
+        name: file?.filename,
+        mimetype: file?.mimetype,
+        type: req.body?.type,
+      };
+    });
+    try {
+      const updatedNote = await userService.updateProfile(data, userId as string);
+      res.send(updatedNote);
+    } catch (error) {}
   }
   async updatePassword(req: Request, res: Response) {
     try {
@@ -185,16 +181,16 @@ export class UserAuthController {
   async googleLogin(req: Request, res: Response) {
     try {
       const googleId = req.body.googleId;
-      console.log("🚀 ~ UserAuthController ~ googleLogin ~ googleId:", googleId)
+      console.log('🚀 ~ UserAuthController ~ googleLogin ~ googleId:', googleId);
       const data = await authService.googleLogin(googleId);
-      console.log("🚀 ~ UserAuthController ~ googleLogin ~ data:", data)
+      console.log('🚀 ~ UserAuthController ~ googleLogin ~ data:', data);
       const tokens = webTokenService.generateTokens(
         {
           id: data.id,
         },
         data.role,
       );
-      console.log("🚀 ~ UserAuthController ~ googleLogin ~ tokens:", tokens)
+      console.log('🚀 ~ UserAuthController ~ googleLogin ~ tokens:', tokens);
       res.status(StatusCodes.SUCCESS).json({
         data: {
           user: {
@@ -259,23 +255,22 @@ export class UserAuthController {
       // + sign le string lai integer ma convert garxa
       if (Date.now() > +expires) throw HttpException.badRequest(Message.otpExpired);
       const payload = `${req.body.email}.${req.body.otp}.${expires}`;
-
       const data = await OtpService.verifyOtp(hashedOtp, payload);
-      if(!data) throw HttpException.notFound
-      const setTrue= await authService.setOptVerified(req.body.email,true)
+      if (!data) throw HttpException.notFound;
+      const setTrue = await authService.setOptVerified(req.body.email, true);
       console.log('🚀 ~ UserAuthController ~ verifyOtp ~ data:', data);
       res.status(StatusCodes.SUCCESS).json({
-        data:setTrue,
+        data: setTrue,
         status: true,
         message: Message.validOtp,
-      })
+      });
     } catch (error) {
       throw HttpException.badRequest(`Internal Error`);
     }
   }
-  async resetPassword(req:Request,res:Response){
-    console.log(req.body)
-    const data = await authService.resetPassword(req.body)
-    console.log("🚀 ~ UserAuthController ~ resetPassword ~ data:", data)
+  async resetPassword(req: Request, res: Response) {
+    console.log(req.body);
+    const data = await authService.resetPassword(req.body);
+    console.log('🚀 ~ UserAuthController ~ resetPassword ~ data:', data);
   }
 }
