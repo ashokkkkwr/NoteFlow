@@ -123,9 +123,9 @@ class AuthService {
       // Save the updated user record to the database
       const save = await this.userRepo.save(user);
       return save;
-    } catch (error) {
+    } catch (error:any) {
       console.error('🚀 ~ AuthService ~ updatePassword ~ error:', error);
-      throw HttpException.badRequest(`Error updating password`);
+      throw HttpException.badRequest(error.message);
     }
   }
   async setOptVerified(email:string,verify:boolean){
