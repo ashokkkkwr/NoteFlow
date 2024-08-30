@@ -269,8 +269,19 @@ export class UserAuthController {
     }
   }
   async resetPassword(req: Request, res: Response) {
-    console.log(req.body);
-    const data = await authService.resetPassword(req.body);
-    console.log('🚀 ~ UserAuthController ~ resetPassword ~ data:', data);
+    try{
+      console.log(req.body);
+      const data = await authService.resetPassword(req.body);
+      console.log('🚀 ~ UserAuthController ~ resetPassword ~ data:', data);
+      res.status(StatusCodes.SUCCESS).json({
+        data: data,
+        status: true,
+        message: Message.passwordChange,
+      });
+    }catch(error){
+      throw HttpException.badRequest(`Internal Error`);
+
+    }
+  
   }
 }

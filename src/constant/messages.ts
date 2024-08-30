@@ -11,5 +11,6 @@ export const Message = {
   deleted:'Successfully deleted',
   emailSent:'successfully email sent',
   otpExpired:'Opt has been expired',
-  validOtp:"Valid Otp is given"
+  validOtp:"Valid Otp is given",
+  passwordChange:"password Changed"
 }
