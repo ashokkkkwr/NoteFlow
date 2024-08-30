@@ -69,7 +69,7 @@ class CommentService {
             note: { id: postId },
             parent: IsNull(),
         },
-        relations: ['replies', 'user', 'user.details'],
+        relations: ['replies', 'user', 'user.details','user.details.profileImage'],
     });
 
     // Recursively load replies and their details
@@ -84,7 +84,7 @@ private async loadReplies(comment: Comment): Promise<void> {
     // Fetch replies with user details
     comment.replies = await this.CommentRepo.find({
         where: { parent: { id: comment.id } },
-        relations: ['user', 'user.details'],
+        relations: ['user', 'user.details','user.details.profileImage'],
     });
 
     // For each reply, fetch its replies and user details recursively
@@ -92,7 +92,7 @@ private async loadReplies(comment: Comment): Promise<void> {
         if (reply.user) {
             reply.user = await this.userRepo.findOne({
                 where: { id: reply.user.id },
-                relations: ['details'],
+                relations: ['details','details.profileImage'],
             });
         }
         await this.loadReplies(reply); // Recursively load nested replies
