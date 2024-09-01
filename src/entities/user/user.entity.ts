@@ -7,6 +7,7 @@ import { Role } from '../../constant/enum';
 import { Friends } from '../../entities/friends.entity';
 import { Message } from '../message.entity';
 import { Room } from '../room.entity';
+import { Like } from '../../entities/like.entity';
 
 @Entity('user')
 export class User extends Base {
@@ -56,4 +57,6 @@ export class User extends Base {
   
   @Column({ name: 'opt_verified', default: false })
   otpVerified: boolean;
+  @OneToMany(() => Like, like => like.user, { cascade: true })
+  likes: Like[];
 }
