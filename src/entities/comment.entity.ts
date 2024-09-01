@@ -18,4 +18,5 @@ class Comment extends Base {
   @JoinColumn({name: 'user_id'})
   user: User | null;
 }
+
 export default Comment;
