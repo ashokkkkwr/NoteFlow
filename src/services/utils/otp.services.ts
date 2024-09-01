@@ -29,5 +29,21 @@ import HashService from './hash.service';
       ),
     });
   }
+  async sendLoggedInMail(data: any) {
+    const mailContent = {
+      to: data?.email,
+      subject: 'New Login Detected on Your Account',
+      text: `Hello ${data?.email || 'User'},\n\nWe noticed a new login to your account from a device. If this was you, no further action is needed.\n\nIf you did not log in, please reset your password immediately.\n\nThank you,\nYour Company Name`,
+      html: generateHtml(
+        `<p>Hello ${data?.name || 'User'},</p>
+         <p>We noticed a new login to your account from a device. If this was you, no further action is needed.</p>
+         <p>If you did not log in, please reset your password immediately.</p>
+         <p>Thank you,<br/>Your Company Name</p>`
+      ),
+    };
+  
+    await this.mailService.sendMail(mailContent);
+  }
+  
 }
 export default new OtpService

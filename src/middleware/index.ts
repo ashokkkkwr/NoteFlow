@@ -35,7 +35,6 @@ const middleware = (app: Application) => {
       limit: '10mb',
     })
   )
-
   //app.use(morganMiddleware)
   app.use(morgan('common'))
   app.use(express.urlencoded({extended:false}))

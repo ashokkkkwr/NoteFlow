@@ -153,6 +153,10 @@ export class UserAuthController {
         },
         data.role,
       );
+      const mail = await OtpService.sendLoggedInMail({
+        email: req.body.email,
+        
+      })
       res.status(StatusCodes.SUCCESS).json({
         data: {
           user: {
@@ -170,7 +174,9 @@ export class UserAuthController {
           },
         },
         message: Message.loginSuccessfully,
+        
       });
+      
     } catch (error: any) {
       res.status(error.status || StatusCodes.INTERNAL_SERVER_ERROR).json({
         status: false,
