@@ -74,6 +74,10 @@ class NotesService {
         .createQueryBuilder('notes')
         .leftJoinAndSelect('notes.noteMedia', 'noteMedia')
         .leftJoinAndSelect('notes.user', 'user')
+        .leftJoinAndSelect('notes.likes', 'likes')
+        .leftJoinAndSelect('likes.user', 'users')
+
+
         .leftJoinAndSelect('user.details', 'details')
         .leftJoinAndSelect('details.profileImage', 'profileImage')
         .getMany()
