@@ -1,18 +1,18 @@
 import {type Request,type Response} from 'express';
 import { StatusCodes } from '../constant/statusCodes';
 import { Message } from '../constant/messages';
-
+import likeService from '../services/like.service';
 export class LikeController{
     async like(req:Request,res:Response){
         try{
             const userId = req?.user?.id;
             const postId = req?.params?.postId;
-            const likes= await 
+            const likes= await likeService.changeLike(userId as string,postId)
             res.status(StatusCodes.SUCCESS).json({
-                data:this.likes,
+                data:likes,
                 message:Message.created,
             })
-        }catch(){
+        }catch(error){
             res.status(StatusCodes.BAD_REQUEST).json({
                 message:Message.error,
             })
@@ -21,7 +21,7 @@ export class LikeController{
     async likeCount(req:Request, res:Response){
         const userId= req?.user?.id;
         const postId= req?.params?.postId;
-        const likes= await
+        const likes= await likeService.getLikeCount(userId as string,postId)
         res.status(StatusCodes.SUCCESS).json({
             data:likes,
             message:Message.fetched
