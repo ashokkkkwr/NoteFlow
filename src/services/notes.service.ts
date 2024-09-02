@@ -160,5 +160,25 @@ WHERE n.id = $1 AND u.id = $2;
     await this.notesRepo.delete(note.id);
     return note
   }
+  async getAllUserPost(userId:string){
+    console.log("🚀 ~ NotesService ~ getAllUserPost ~ userId:", userId)
+    try {
+      return await this.notesRepo
+        .createQueryBuilder('notes')
+        .leftJoinAndSelect('notes.noteMedia', 'noteMedia')
+        .leftJoinAndSelect('notes.user', 'user')
+        .leftJoinAndSelect('notes.likes', 'likes')
+        .leftJoinAndSelect('likes.user', 'users')
+
+
+        .leftJoinAndSelect('user.details', 'details')
+        .leftJoinAndSelect('details.profileImage', 'profileImage')
+        .where('notes.user = :userId', { userId })
+
+        .getMany()
+    } catch (error: any) {
+      throw HttpException.badRequest(error.message)
+    }
+  }
 }
 export default new NotesService()

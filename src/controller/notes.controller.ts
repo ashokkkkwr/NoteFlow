@@ -129,6 +129,15 @@ export class NotesController {
       })
     }
   }
+  async getAllUserPost(req:Request,res:Response){
+    const userId= req?.user?.id
+    const data = await notesService.getAllUserPost(userId as string)
+    res.status(StatusCodes.SUCCESS).json({
+      status: true,
+      message: Message.fetched,
+      data,
+    })
+  }
 }
 
 export default new NotesController()
