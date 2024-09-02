@@ -3,9 +3,9 @@ import Base from './base.entity'
 import { User } from './user/user.entity'
 import { Notes } from './note/notes.entity'
 
-@Entity('like')
+@Entity('likes')
 export class Like extends Base{
-    @Column()
+    @Column({name:'isLiked'})
     isLiked:boolean
 
     @ManyToOne(()=>User,user=>user.likes,{

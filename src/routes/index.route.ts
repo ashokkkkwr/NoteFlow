@@ -5,6 +5,7 @@ import friend from './friend.route'
 import comment from './comment.route'
 import auth from './auth.route'
 import chat from './chat.route'
+import like from './like.route'
 export interface Route {
   path: string
   route: Router
@@ -33,6 +34,10 @@ const routes: Route[] = [
   },{
   path:'/chat',
   route:chat},
+  {
+    path:'/like',
+    route:like
+  }
 
 ]
 
