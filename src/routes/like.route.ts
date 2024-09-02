@@ -3,12 +3,11 @@ import RequestValidator from '../middleware/Request.Validator'
 import express from 'express'
 import { authorization } from '../middleware/authorization.middleware'
 import { authentication } from '../middleware/authentication.middleware'
-import { CommentController } from '../controller/comment.controller'
 import likeController from '../controller/like.controller' 
-const commentController = new CommentController()
-
-
 const router = express.Router()
 router.use(authentication())
 router.post('/like/:id',catchAsync(likeController.like))
+router.get('/like/:id',catchAsync(likeController.likeCount))
+router.get('/user-like',catchAsync(likeController.userLike))
+router.get('/post-like/:id',catchAsync(likeController.postLike))
 export default router
