@@ -15,6 +15,8 @@ const notesController = new NotesController()
 router.get('/all', catchAsync(notesController.getAll))
 router.use(authentication())
 router.get('/user/all',catchAsync(notesController.getAllUserPost))
+router.get('/user/all/:id',catchAsync(notesController.getSelectedUserPost))
+
 
 router.use(authorization([Role.USER]))
 
