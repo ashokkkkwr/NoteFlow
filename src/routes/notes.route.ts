@@ -14,6 +14,8 @@ const notesController = new NotesController()
 
 router.get('/all', catchAsync(notesController.getAll))
 router.use(authentication())
+router.get('/user/all',catchAsync(notesController.getAllUserPost))
+
 router.use(authorization([Role.USER]))
 
 router.post('/',  upload.array('files'),catchAsync(notesController.create))
