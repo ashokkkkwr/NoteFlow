@@ -2,11 +2,13 @@ import {type Request,type Response} from 'express';
 import { StatusCodes } from '../constant/statusCodes';
 import { Message } from '../constant/messages';
 import likeService from '../services/like.service';
-export class LikeController{
+ class LikeController{
     async like(req:Request,res:Response){
         try{
             const userId = req?.user?.id;
-            const postId = req?.params?.postId;
+            console.log("🚀 ~ LikeController ~ like ~ userId:", userId)
+            const postId = req?.params?.id;
+            console.log("🚀 ~ LikeController ~ like ~ postId:", postId)
             const likes= await likeService.changeLike(userId as string,postId)
             res.status(StatusCodes.SUCCESS).json({
                 data:likes,
@@ -28,3 +30,4 @@ export class LikeController{
         })
     }
 }
+export default new LikeController

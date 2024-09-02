@@ -12,10 +12,13 @@ class LikeService{
 
     ){}
     async like(userId:string,postId:string){
+        console.log("🚀 ~ LikeService ~ like ~ postId:", postId)
         try{
             const user= await this.userRepo.findOneBy({id:userId});
+            console.log("🚀 ~ LikeService ~ like ~ user:", user)
             if(!user)throw HttpException.unauthorized;
             const post = await this.postRepo.findOneBy({id:postId})
+            console.log("🚀 ~ LikeService ~ like ~ post:", post)
             if(!post) throw HttpException.notFound;
 
             const likes = this.likeRepo.create({
@@ -23,6 +26,7 @@ class LikeService{
                 user:user,
             note:post
             })
+            console.log("🚀 ~ LikeService ~ like ~ likes:", likes)
             await this.likeRepo.save(likes)
             return likes;
         }catch(error){
@@ -61,10 +65,12 @@ class LikeService{
                     note:{id:postId}
                 }
             })
+            console.log("🚀 ~ LikeService ~ changeLike ~ changeLikes:", changeLikes)
             if(changeLikes){
                 await this.dislike(userId,postId)
             }else{
                 await this.like(userId,postId)
+                
             }
             return changeLikes
         }catch(error){
