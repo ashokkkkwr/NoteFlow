@@ -22,7 +22,6 @@ const middleware = (app: Application) => {
   app.use((req: Request, res: Response, next: NextFunction) => {
     const userAgent = req.headers['user-agent']
     const apiKey = req.headers['apikey']
-
     if (userAgent && userAgent.includes('Mozilla')) {
       next()
     } else {

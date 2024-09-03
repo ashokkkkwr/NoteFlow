@@ -14,8 +14,7 @@ export class DotenvConfig {
   static DATABASE_USERNAME = process.env.DATABASE_USERNAME
   static DATABASE_PASSWORD = process.env.DATABASE_PASSWORD
   static DATABASE_NAME = process.env.DATABASE_NAME
-
-  // *Other Configurations
+ // *Other Configurations
   static DEBUG_MODE = process.env.DEBUG_MODE
 
   // JWT configuration
