@@ -16,12 +16,15 @@ class CommentService {
   ) {}
   async create(userId:any,postId: string, data: CommentDTO) {
     const note = await this.NoteRepo.findOne({ where: { id: postId } });
+    console.log("🚀 ~ CommentService ~ create ~ note:", note)
 
     if (!note) {
       throw new Error('Note not found');
     }
 
     const user = await this.userRepo.findOne({where :{id:userId}})
+    console.log("🚀 ~ CommentService ~ create ~ userId:", userId)
+    console.log("🚀 ~ CommentService ~ create ~ user:", user)
     if(!user){
       throw new Error('Note not found');
     }

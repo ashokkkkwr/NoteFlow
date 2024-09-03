@@ -12,6 +12,8 @@ const commentController = new CommentController()
 
 
 const router = express.Router()
+router.use(authentication())
+
 router.post('/:id',RequestValidator.validate(CommentDTO),catchAsync(commentController.addComment))
 router.delete('/:id',catchAsync(commentController.deleteComments))
 router.patch('/:id',catchAsync(commentController.updateComment))
