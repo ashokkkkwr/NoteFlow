@@ -8,15 +8,9 @@
 
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc",
-    "start:dev": "ts-node-dev  src/server.ts",
-    "format": "npx prettier --write .",
-    "format:check": "npx prettier --check .",
-    "lint": "eslint src --ext ts --report-unused-disable-directives --max-warnings 0",
-    "lint:fix": "eslint --quiet --ext .ts src --fix",
-    "sass": "sass --watch public/style/index.scss:public/style/index.css",
-    "seed:admin": "ts-node-dev  ./src/seeder/admin.seed.ts seed"
+   
+    "start": "ts-node-dev  src/server.ts"
+   
   },
   "keywords": [],
   "author": "",
