@@ -194,10 +194,12 @@ class FriendService {
     }
   }
   async accepted(friendId: string, userId: any) {
+    console.log("🚀 ~ FriendService ~ accepted ~ friendId:", friendId)
+    console.log("🚀 ~ FriendService ~ accepted ~ userId:", userId)
     const friendRequest = await this.friendsRepo.findOne({
       where: {
 
-        receiver_id: userId,
+        id: friendId,
       },
     });
     console.log(friendRequest, 'checking the reuqest')
@@ -208,7 +210,8 @@ class FriendService {
 
 
     friendRequest.status = Status.ACCEPTED;
-    await this.friendsRepo.save(friendRequest);
+    const save = await this.friendsRepo.save(friendRequest);
+    console.log("🚀 ~ FriendService ~ accepted ~ save:", save)
 
     return friendRequest;
   }
