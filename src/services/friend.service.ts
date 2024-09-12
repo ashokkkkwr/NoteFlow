@@ -160,8 +160,34 @@ class FriendService {
       throw new HttpException('Not Found', 404);
     }
   }
+  async viewRequest(receiverUserId: string) {
+    try {
+      console.log('jpt1');
 
+      const view = await this.friendsRepo.find({
+        where: [
+          { receiver: { id: receiverUserId }, status: Status.PENDING },
+          { sender: { id: receiverUserId }, status: Status.PENDING },
+        ],
+        relations: [
+          'sender',
+          'receiver',
+          'sender.details',
+          'sender.details.profileImage',
+          'receiver.details',
+          'receiver.details.profileImage',
+        ],
+      });
+      const friends = view.map((friend) =>
+        friend.sender.id === receiverUserId ? friend.receiver : friend.sender
+      );
 
+      return friends;
+    } catch (error) {
+      console.error('Error:', error);
+      throw new HttpException('Not Found', 404);
+    }
+  }
   async viewUser(loggedInUserId: any) {
     try {
       const users = await this.userRepo.createQueryBuilder('user')
