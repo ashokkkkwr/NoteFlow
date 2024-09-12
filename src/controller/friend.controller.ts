@@ -76,6 +76,20 @@ export class friendController {
       })
     } catch (error) {}
   }
+  async viewRequests(req: Request, res: Response) {
+    try {
+      console.log('jpt')
+      const receiverUserId = req.user?.id
+      const friendRequests = await friendService.viewRequest(receiverUserId as string)
+      console.log(friendRequests)
+
+      res.status(StatusCodes.SUCCESS).json({
+        data: friendRequests,
+        status: true,
+        message: Message.fetched,
+      })
+    } catch (error) {}
+  }
   async viewUser(req: Request, res: Response) {
     try {
       const userId = req.user?.id

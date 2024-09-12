@@ -13,6 +13,8 @@ router.use(authorization([Role.USER]))
 router.post('/:id',catchAsync(FriendController.addFriend))
 router.get('/',catchAsync(FriendController.viewFriendRequest))
 router.get('/friends',catchAsync(FriendController.viewFriends))
+router.get('/friends/requests',catchAsync(FriendController.viewRequests))
+
 router.get('/notification',catchAsync(FriendController.viewNotification))
 router.patch('/read/:id',catchAsync(FriendController.markNotification))
 
