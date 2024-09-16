@@ -139,7 +139,6 @@ export class NotesController {
     })
   }
   async getSelectedUserPost(req:Request,res:Response){
-
     const userId= req?.params.id
     const data = await notesService.getAllUserPost(userId as string)
     res.status(StatusCodes.SUCCESS).json({
