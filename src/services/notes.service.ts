@@ -14,7 +14,6 @@ class NotesService {
     private readonly userRepo = AppDataSource.getRepository(User),
     private readonly imageRepo = AppDataSource.getRepository(NoteMedia),
     private readonly commentRepo = AppDataSource.getRepository(Comment)
-
   ) {}
   async create(userId: any, data: NotesDTO, img: any[]) {
     console.log(userId, 'user ID')

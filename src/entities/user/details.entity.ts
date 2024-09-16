@@ -28,4 +28,6 @@ export class UserDetails extends Base {
 
   @OneToMany(() => UserMedia, (media) => media.UserMedia)
   profileImage: UserMedia[];
+
+  
 }
