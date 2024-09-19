@@ -56,8 +56,7 @@ class ChatService {
         order: {
           createdAt: 'ASC',
         },
-      });
-
+      })
       const decryptedChats = chats.map((chat) => {
         try {
           const decryptedMessage = EncryptionService.decryptMessage(chat.content);
@@ -66,7 +65,7 @@ class ChatService {
           console.error(`Failed to decrypt message with ID ${chat.id}:`, error);
           throw new HttpException('Failed to decrypt message', 403);
         }
-      });
+      })
 
       return decryptedChats;
     } catch (error) {
