@@ -1,4 +1,4 @@
-NoteFlow Backend
+<h1>NoteFlow Backend</h1>
 Welcome to the NoteFlow backend repository! This project serves as the backend for a complete social media platform, providing robust APIs for features like user authentication, posts, comments, real-time chat, friend requests, and notifications.
 
 Features
