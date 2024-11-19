@@ -1,5 +1,5 @@
-PostFlow Backend
-Welcome to the PostFlow backend repository! This project serves as the backend for a complete social media platform, providing robust APIs for features like user authentication, posts, comments, real-time chat, friend requests, and notifications.
+NoteFlow Backend
+Welcome to the NoteFlow backend repository! This project serves as the backend for a complete social media platform, providing robust APIs for features like user authentication, posts, comments, real-time chat, friend requests, and notifications.
 
 Features
 The backend includes the following features:
