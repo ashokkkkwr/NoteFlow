@@ -10,4 +10,4 @@ Post System: Add, edit, delete, and fetch posts, with support for media uploads.
 Comment System: Nested comments for posts.
 Real-Time Chat: Built with Socket.IO for real-time messaging.
 Notifications: Real-time notifications for activities such as friend requests and likes.
-Scalability: Designed for scalability and performance.
+Scalability: Designed for scalability and performance, used redis.
