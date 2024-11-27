@@ -57,17 +57,17 @@ class ChatService {
           createdAt: 'ASC',
         },
       })
-      const decryptedChats = chats.map((chat) => {
-        try {
-          const decryptedMessage = EncryptionService.decryptMessage(chat.content);
-          return {...chat, content: decryptedMessage};
-        } catch (error) {
-          console.error(`Failed to decrypt message with ID ${chat.id}:`, error);
-          throw new HttpException('Failed to decrypt message', 403);
-        }
-      })
+      // const decryptedChats = chats.map((chat) => {
+      //   try {
+      //     const decryptedMessage = EncryptionService.decryptMessage(chat.content);
+      //     return {...chat, content: decryptedMessage};
+      //   } catch (error) {
+      //     console.error(`Failed to decrypt message with ID ${chat.id}:`, error);
+      //     throw new HttpException('Failed to decrypt message', 403);
+      //   }
+      // })
 
-      return decryptedChats;
+      return chats;
     } catch (error) {
       console.log('Error in getMessages:', error);
       throw new HttpException('Could not retrieve messages', 500);
